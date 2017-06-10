@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "367311786053",
+    "firebase_url": "https://joker-ad917.firebaseio.com",
+    "project_id": "joker-ad917",
+    "storage_bucket": "joker-ad917.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:367311786053:android:88359809000d779c",
+        "android_client_info": {
+          "package_name": "com.ervin.joker"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "367311786053-cbqqvov9b80gqkhu71auoefmb3i5r4to.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ervin.joker",
+            "certificate_hash": "9d74202d612835eec51bbbf38e12bff56a11b0c7"
+          }
+        },
+        {
+          "client_id": "367311786053-1tr80dqlai10i2pf8tnqf2reb2clfnmv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCIlIOPKk7QIIa_GZa5v4jB3bMmwBhM_v0"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "367311786053-1tr80dqlai10i2pf8tnqf2reb2clfnmv.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
