@@ -1,4 +1,4 @@
-package com.ervin.joker;
+package com.ervin.joker.berkas;
 
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -7,6 +7,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.ervin.joker.R;
 
 /**
  * Created by ervin on 6/6/2017.

@@ -19,19 +19,19 @@
         android:id="@+id/textView13"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Pilih dokumen yang telah di unggah sebelumnya untuk dikirim"
-        android:textSize="18sp"
         android:layout_above="@+id/pick_button_dokumen"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_marginBottom="8dp" />
+        android:layout_marginBottom="8dp"
+        android:text="Pilih dokumen dari memory untuk di unggah ke server"
+        android:textSize="18sp" />
 
     <TextView
         android:id="@+id/textView15"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@+id/pick_button"
-        android:text="Pilih dokumen dari memory untuk di unggah ke server"
+        android:text="Pilih dokumen yang telah di unggah sebelumnya untuk dikirim"
         android:textSize="18sp" />
 
     <Button

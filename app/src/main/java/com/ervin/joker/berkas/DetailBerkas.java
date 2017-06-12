@@ -1,4 +1,4 @@
-package com.ervin.joker;
+package com.ervin.joker.berkas;
 
 import android.content.ActivityNotFoundException;
 import android.content.Context;
@@ -19,6 +19,7 @@ import android.widget.TextView;
 import android.widget.ToggleButton;
 
 import com.bumptech.glide.Glide;
+import com.ervin.joker.R;
 import com.google.android.youtube.player.YouTubeInitializationResult;
 import com.google.android.youtube.player.YouTubePlayer;
 import com.google.android.youtube.player.YouTubePlayerFragment;
@@ -52,6 +53,7 @@ public class DetailBerkas extends AppCompatActivity implements YouTubePlayer.OnI
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_detail_berkas);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         final DatabaseReference myRef = database.getReference();
         String nama = getIntent().getStringExtra("nama_perusahaan");
@@ -79,7 +81,7 @@ public class DetailBerkas extends AppCompatActivity implements YouTubePlayer.OnI
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
-                    toggleButton.setBackgroundDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.star_filled));
+                    toggleButton.setBackgroundDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.star));
                     myRef.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
@@ -96,7 +98,7 @@ public class DetailBerkas extends AppCompatActivity implements YouTubePlayer.OnI
                         }
                     });
                 } else {
-                    toggleButton.setBackgroundDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.star));
+                    toggleButton.setBackgroundDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.star_black));
                     myRef.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
@@ -160,8 +162,8 @@ public class DetailBerkas extends AppCompatActivity implements YouTubePlayer.OnI
 //            Toast.makeText(this, error, Toast.LENGTH_LONG).show();
         }
     }
-    public void onStart() {
-        super.onStart();
-
+    public boolean onSupportNavigateUp(){
+        finish();
+        return true;
     }
 }

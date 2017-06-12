@@ -1,4 +1,4 @@
-package com.ervin.joker;
+package com.ervin.joker.berkas;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -8,9 +8,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 
+import com.ervin.joker.R;
+import com.ervin.joker.pengguna.User;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -19,10 +20,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Created by ervin on 6/6/2017.
@@ -44,7 +41,7 @@ public class BerkasLamaranList extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_list_berkas_lamaran);
-
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             mAuth = FirebaseAuth.getInstance();
             rv = (RecyclerView) findViewById(R.id.recycler_view_berkas);
         final String id_lowongan = getIntent().getStringExtra("lowongan_id");
@@ -154,6 +151,10 @@ public class BerkasLamaranList extends AppCompatActivity {
             };
 
             rv.setAdapter(mFirebaseAdapter);
+    }
+    public boolean onSupportNavigateUp(){
+        finish();
+        return true;
     }
 
 }

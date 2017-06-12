@@ -2,10 +2,7 @@ package com.ervin.joker;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentTransaction;
-import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -14,13 +11,30 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
+import com.ervin.joker.lowongan.LowonganPekerjaanPersonalia;
+import com.ervin.joker.lowongan.TambahLowongan;
+import com.ervin.joker.pengguna.Reauntentifikasi;
+import com.ervin.joker.pengguna.User;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MainActivityPersonalia extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
-
+    FirebaseDatabase database = FirebaseDatabase.getInstance();
+    DatabaseReference myRef = database.getReference();
+    TextView nama;
+    TextView email;
+    String jenisPengguna;
     private FirebaseAuth mAuth;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,13 +43,43 @@ public class MainActivityPersonalia extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         mAuth = FirebaseAuth.getInstance();
-        FirebaseUser user = mAuth.getCurrentUser();
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+        final FirebaseUser personalia = mAuth.getCurrentUser();
+        myRef.child("User").addValueEventListener(new ValueEventListener() {
             @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // This method is called once with the initial value and again
+                // whenever data at this location is updated.
+                if (dataSnapshot.hasChild(personalia.getUid())) {
+                    myRef.child("User").child(personalia.getUid()).addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            // This method is called once with the initial value and again
+                            // whenever data at this location is updated.
+
+                            User user = dataSnapshot.getValue(User.class);
+                            Glide.with(MainActivityPersonalia.this).load(user.getPhoto_profil()).placeholder(R.drawable.ic_menu_gallery).dontAnimate().centerCrop()
+                                    .into((CircleImageView) findViewById(R.id.iv_photo_profile_personalia));
+                            nama = (TextView) findViewById(R.id.nama_profile_personalia);
+                            nama.setText(user.getNama());
+                            email = (TextView) findViewById(R.id.email_profile_personalia);
+                            email.setText(personalia.getEmail());
+                            jenisPengguna = user.getJenis_pengguna();
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError error) {
+                            // Failed to read value
+
+                        }
+                    });
+
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                // Failed to read value
+
             }
         });
 
@@ -57,7 +101,10 @@ public class MainActivityPersonalia extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
+            Intent intent = new Intent(Intent.ACTION_MAIN);
+            intent.addCategory(Intent.CATEGORY_HOME);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(intent);
         }
     }
 
@@ -92,9 +139,6 @@ public class MainActivityPersonalia extends AppCompatActivity
         if (id == R.id.nav_camera) {
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.replace(R.id.content_frame2, new LowonganPekerjaanPersonalia()).commit();
-        } else if (id == R.id.nav_gallery) {
-            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.replace(R.id.content_frame2, new ListLowonganEdit()).commit();
         } else if (id == R.id.nav_slideshow) {
             mAuth.signOut();
             Intent intent = new Intent(this, SignIn.class);
@@ -104,12 +148,12 @@ public class MainActivityPersonalia extends AppCompatActivity
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.replace(R.id.content_frame2, new TambahLowongan()).commit();
         } else if (id == R.id.nav_share) {
-            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.replace(R.id.content_frame2, new EditProfilePersonalia()).commit();
-        } else if (id == R.id.nav_send) {
-
+//            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+//            ft.replace(R.id.content_frame2, new EditProfilePersonalia()).commit();
+            Intent intent = new Intent(MainActivityPersonalia.this, Reauntentifikasi.class);
+            intent.putExtra("jenis", jenisPengguna);
+            startActivity(intent);
         }
-
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;

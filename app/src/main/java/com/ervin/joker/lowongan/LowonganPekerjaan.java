@@ -1,4 +1,4 @@
-package com.ervin.joker;
+package com.ervin.joker.lowongan;
 
 import java.io.Serializable;
 

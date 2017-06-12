@@ -1,28 +1,25 @@
-package com.ervin.joker;
+package com.ervin.joker.pengguna;
 
-import android.app.Activity;
-import android.support.v4.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.ervin.joker.MainActivityPersonalia;
+import com.ervin.joker.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -37,17 +34,16 @@ import com.google.firebase.storage.UploadTask;
 import java.io.File;
 import java.util.ArrayList;
 
+import de.hdodenhof.circleimageview.CircleImageView;
 import in.myinnos.awesomeimagepicker.activities.AlbumSelectActivity;
 import in.myinnos.awesomeimagepicker.helpers.ConstantsCustomGallery;
 import in.myinnos.awesomeimagepicker.models.Image;
-
-import static android.app.Activity.RESULT_OK;
 
 /**
  * Created by ervin on 6/8/2017.
  */
 
-public class EditProfilePersonalia extends Fragment {
+public class EditProfilePersonalia extends AppCompatActivity {
     private static final String TAG = "SignUpAsPersonalia";
     EditText edtEmail, edtPassword, edtNama, edtDescription, edtVideo;
     Button btnRegister;
@@ -63,19 +59,20 @@ public class EditProfilePersonalia extends Fragment {
     private static final int GET_DATA = 7;
     private FirebaseAuth.AuthStateListener mAuthListener;
     String jenis_pengguna = "Personalia";
-    @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        View vw = inflater.inflate(R.layout.layout_edit_profile_personalia, container, false);
+    boolean gambar = false;
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.layout_edit_profile_personalia);
 
-        edtEmail = (EditText) vw.findViewById(R.id.edt_edit_profile_email);
-        edtNama = (EditText) vw.findViewById(R.id.edt_edit_profile_nama);
-        edtPassword = (EditText) vw.findViewById(R.id.edt_edit_profile_password);
-        edtDescription = (EditText) vw.findViewById(R.id.edt_edit_profile_deskripsi);
-        edtVideo = (EditText) vw.findViewById(R.id.ed_edit_profile_videoid);
-        btnRegister = (Button) vw.findViewById(R.id.btn_edit_profile_personaloa);
-        ivGambarProfile = (ImageView) vw.findViewById(R.id.iv_edit_profile_photo);
-        ivUploadVideo = (ImageView) vw.findViewById(R.id.iv_edit_profile_upload_video);
-        progressDialog = new ProgressDialog(getActivity());
+        edtEmail = (EditText) findViewById(R.id.edt_edit_profile_email);
+        edtNama = (EditText) findViewById(R.id.edt_edit_profile_nama);
+        edtPassword = (EditText) findViewById(R.id.edt_edit_profile_password);
+        edtDescription = (EditText) findViewById(R.id.edt_edit_profile_deskripsi);
+        edtVideo = (EditText) findViewById(R.id.ed_edit_profile_videoid);
+        btnRegister = (Button) findViewById(R.id.btn_edit_profile_personaloa);
+        ivGambarProfile = (CircleImageView) findViewById(R.id.iv_edit_profile_photo);
+        ivUploadVideo = (ImageView) findViewById(R.id.iv_edit_profile_upload_video);
+        progressDialog = new ProgressDialog(EditProfilePersonalia.this);
         mAuth = FirebaseAuth.getInstance();
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         myRef = database.getReference();
@@ -92,11 +89,16 @@ public class EditProfilePersonalia extends Fragment {
                 String deskripsi = personalia.getDeskripsi();
                 String videoID = personalia.getVideo_id();
                 edtEmail.setText(personaliaa.getEmail());
-                edtNama.setText(sgetGambar);
+                //edtNama.setText(sgetGambar);
                 edtDescription.setText(deskripsi);
                 edtVideo.setText(videoID);
                 edtNama.setText(sgetNama);
-                Glide.with(getActivity()).load(sgetGambar).into(ivGambarProfile);
+                Log.d(TAG, "User password updated." + sgetGambar);
+                if(!sgetGambar.isEmpty()){
+                    gambar=true;
+                    rawPathImage= Uri.parse(sgetGambar);
+                }
+                Glide.with(EditProfilePersonalia.this).load(sgetGambar).placeholder(R.drawable.ic_menu_gallery).dontAnimate().into(ivGambarProfile);
 //                String value = dataSnapshot.getValue(String.class);
 //                Log.d(TAG, "Value is: " + value);
             }
@@ -118,53 +120,62 @@ public class EditProfilePersonalia extends Fragment {
                 final String deskripsi = edtDescription.getText().toString();
                 final String video = edtVideo.getText().toString();
                 final FirebaseUser user = mAuth.getCurrentUser();
-                user.updateEmail(email)
-                        .addOnCompleteListener(new OnCompleteListener<Void>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Void> task) {
-                                if (task.isSuccessful()) {
-                                    Log.d(TAG, "User email address updated.");
+                if(email.isEmpty()||password.isEmpty()||nama.isEmpty()||gambar==false||video.isEmpty()||deskripsi.isEmpty()) {
+                    Toast.makeText(EditProfilePersonalia.this, "Isikan semua field yang ada",
+                            Toast.LENGTH_SHORT).show();
+                    progressDialog.dismiss();
+                }else {
+                    user.updateEmail(email)
+                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    if (task.isSuccessful()) {
+                                        Log.d(TAG, "User email address updated.");
+                                    }
                                 }
-                            }
-                        });
-                user.updatePassword(password)
-                        .addOnCompleteListener(new OnCompleteListener<Void>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Void> task) {
-                                if (task.isSuccessful()) {
-                                    Log.d(TAG, "User password updated.");
+                            });
+                    user.updatePassword(password)
+                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    if (task.isSuccessful()) {
+                                        Log.d(TAG, "User password updated.");
+                                    }
                                 }
-                            }
-                        });
-                StorageReference riversRef = mStorageRef.child("images/" + user.getUid() + "/" + "phto_profile.jpg");
-                riversRef.putFile(rawPathImage)
-                        .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                            @Override
-                            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                // Get a URL to the uploaded content
-                                @SuppressWarnings("VisibleForTests")
-                                Uri downloadUrl = taskSnapshot.getDownloadUrl();
-                                linkPhoto = String.valueOf(downloadUrl);
-                                User pelamar = new User(nama, linkPhoto, jenis_pengguna, deskripsi, video);
-                                myRef.child("User").child(user.getUid()).setValue(pelamar);
-                                progressDialog.dismiss();
-                            }
-                        })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception exception) {
-                                progressDialog.dismiss();
-                                // Handle unsuccessful uploads
-                                // ...
-                            }
-                        });
+                            });
+                    StorageReference riversRef = mStorageRef.child("images/" + user.getUid() + "/" + "phto_profile.jpg");
+                    riversRef.putFile(rawPathImage)
+                            .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                @Override
+                                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                    // Get a URL to the uploaded content
+                                    @SuppressWarnings("VisibleForTests")
+                                    Uri downloadUrl = taskSnapshot.getDownloadUrl();
+                                    linkPhoto = String.valueOf(downloadUrl);
+                                    User pelamar = new User(nama, linkPhoto, jenis_pengguna, deskripsi, video);
+                                    myRef.child("User").child(user.getUid()).setValue(pelamar);
+
+                                }
+                            })
+                            .addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception exception) {
+
+                                    // Handle unsuccessful uploads
+                                    // ...
+                                }
+                            });
+                    progressDialog.dismiss();
+                    Intent intent = new Intent(EditProfilePersonalia.this,MainActivityPersonalia.class);
+                    startActivity(intent);
+                }
             }
         });
 
         ivGambarProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getActivity(), AlbumSelectActivity.class);
+                Intent intent = new Intent(EditProfilePersonalia.this, AlbumSelectActivity.class);
                 intent.putExtra(ConstantsCustomGallery.INTENT_EXTRA_LIMIT, 1); // set limit for image selection
                 startActivityForResult(intent, ConstantsCustomGallery.REQUEST_CODE);
             }
@@ -173,11 +184,10 @@ public class EditProfilePersonalia extends Fragment {
         ivUploadVideo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getActivity(), com.ervin.joker.video.MainActivity.class);
+                Intent intent = new Intent(EditProfilePersonalia.this, com.ervin.joker.video.MainActivity.class);
                 startActivityForResult(intent, GET_DATA);
             }
         });
-        return vw;
     }
 
 
@@ -194,7 +204,8 @@ public class EditProfilePersonalia extends Fragment {
                         rawPathImage= uri;
                     }
                     // pathImage = rawPathImage.replaceAll("file://","");// untuk menghilangkan "file//" pada path gambar
-                    Glide.with(getActivity()).load(rawPathImage).into(ivGambarProfile);
+                    Glide.with(EditProfilePersonalia.this).load(rawPathImage).dontAnimate().into(ivGambarProfile);
+                    gambar = true;
                 }
                 break;
             case GET_DATA:

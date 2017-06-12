@@ -1,17 +1,19 @@
-package com.ervin.joker;
+package com.ervin.joker.lowongan;
 
 import android.app.DatePickerDialog;
+import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.Toast;
 
+import com.ervin.joker.R;
+import com.ervin.joker.lowongan.LowonganPekerjaan;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
@@ -26,27 +28,22 @@ import java.util.Date;
  * Created by ervin on 6/8/2017.
  */
 
-public class EditLowongan extends AppCompatActivity {
+public class TambahLowongan extends Fragment {
     Button btnPilihTanggal, btnTambahLowongan;
     EditText etPosisiLowong, etTanggal, etDeskripsi;
     private int mYear, mMonth, mDay;
     Date date ;
     private FirebaseAuth mAuth;
-
+    @Nullable
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.layout_edit_lowongan);
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
+        View vw = inflater.inflate(R.layout.layout_tambah_lowongan,container,false);
         mAuth = FirebaseAuth.getInstance();
-        btnPilihTanggal = (Button) findViewById(R.id.btn_edit_lowongan_select_date);
-        btnTambahLowongan = (Button) findViewById(R.id.btn_edit_lowongan_tambah);
-        etDeskripsi = (EditText) findViewById(R.id.et_edit_lowongan_deskripsi);
-        etPosisiLowong = (EditText) findViewById(R.id.et_edit_lowongan_posisi_lowong);
-        etTanggal = (EditText) findViewById(R.id.et_edit_lowongan_date_picker);
-        etPosisiLowong.setText(getIntent().getStringExtra("posisi_lowong"));
-        etTanggal.setText(getIntent().getStringExtra("batas_kiriman"));
-        etDeskripsi.setText(getIntent().getStringExtra("deskripsi_lowongan"));
-        final String lowongan_ID = getIntent().getStringExtra("lowongan_id");
+        btnPilihTanggal = (Button) vw.findViewById(R.id.btn_select_date);
+        btnTambahLowongan = (Button) vw.findViewById(R.id.btn_tambah_lowongan_tambah);
+        etDeskripsi = (EditText) vw.findViewById(R.id.et_tambah_lowongan_deskripsi);
+        etPosisiLowong = (EditText) vw.findViewById(R.id.et_tambah_lowongan_posisi_lowong);
+        etTanggal = (EditText) vw.findViewById(R.id.et_tambah_lowongan_date_picker);
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         final DatabaseReference myRef = database.getReference();
         btnPilihTanggal.setOnClickListener(new View.OnClickListener() {
@@ -56,7 +53,7 @@ public class EditLowongan extends AppCompatActivity {
                 mYear = c.get(Calendar.YEAR);
                 mMonth = c.get(Calendar.MONTH);
                 mDay = c.get(Calendar.DAY_OF_MONTH);
-                DatePickerDialog datePickerDialog = new DatePickerDialog(EditLowongan.this,
+                DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity(),
                         new DatePickerDialog.OnDateSetListener() {
 
                             @Override
@@ -76,7 +73,6 @@ public class EditLowongan extends AppCompatActivity {
                 SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss");
                 String gmtTime = formatter.format(todayDate);
                 String jambaru = tanggal+" "+gmtTime;
-                Log.d("bere", "Value is: " + jambaru);
                 SimpleDateFormat formatter2 = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
 
                 try {
@@ -87,15 +83,19 @@ public class EditLowongan extends AppCompatActivity {
                 Calendar now = Calendar.getInstance();
                 long timeMilisSekarang = now.getTimeInMillis();
                 Long timeInMillis = date.getTime();
-                Log.d("hahah", "Value is: " + timeInMillis);
                 String deskripsi = etDeskripsi.getText().toString();
                 String posisi = etPosisiLowong.getText().toString();
                 FirebaseUser user = mAuth.getCurrentUser();
                 LowonganPekerjaan lowongan = new LowonganPekerjaan(posisi,user.getUid(),deskripsi,timeInMillis,timeMilisSekarang);
-                myRef.child("Lowongan_pekerjaan").child(lowongan_ID).setValue(lowongan);
+                myRef.child("Lowongan_pekerjaan").push().setValue(lowongan);
+                etTanggal.getText().clear();
+                etPosisiLowong.getText().clear();
+                etDeskripsi.getText().clear();
+                Toast.makeText(getActivity(), "Lowongan berhasil ditambahkan",
+                        Toast.LENGTH_SHORT).show();
             }
         });
+
+        return vw;
     }
-
-
 }

@@ -1,4 +1,4 @@
-package com.ervin.joker;
+package com.ervin.joker.berkas;
 
 /**
  * Created by ervin on 6/5/2017.

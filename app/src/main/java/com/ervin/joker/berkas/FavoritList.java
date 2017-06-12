@@ -1,17 +1,17 @@
-package com.ervin.joker;
+package com.ervin.joker.berkas;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 
+import com.ervin.joker.R;
+import com.ervin.joker.pengguna.User;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -21,49 +21,42 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.concurrent.TimeUnit;
-
 /**
- * Created by ervin on 6/6/2017.
+ * Created by ervin on 6/8/2017.
  */
 
-public class LowonganPekerjaanPersonalia extends Fragment {
-    private static final String TAG = "LowonganPekerjaan";
+public class FavoritList extends AppCompatActivity {
+    private static final String TAG = "BerkasLamaranList";
     FirebaseDatabase database = FirebaseDatabase.getInstance();
     DatabaseReference myRef;
     DatabaseReference databaseUser;
     RecyclerView rv;
-    FirebaseRecyclerAdapter<LowonganPekerjaan, LowonganPekerjaanAdapter> mFirebaseAdapter;
+    FirebaseRecyclerAdapter<BerkasLamaran, BerkasLamaranAdapter> mFirebaseAdapter;
     private FirebaseAuth mAuth;
     ProgressDialog progressDialog;
-    String getNama, getGambar, link_video,posisiLowong,deskripsi;
-    long batasPengiriman , tanggalTerbit;
-    @Nullable
+    String getNama, getGambar, link_video,link_dokumen,email_pelamar;
+
+
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View vw = inflater.inflate(R.layout.layout_list_pekerjaan,container,false);
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.layout_list_berkas_lamaran);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         mAuth = FirebaseAuth.getInstance();
-        rv = (RecyclerView) vw.findViewById(R.id.recycleViewGamabar);
-        rv.setLayoutManager(new LinearLayoutManager(getActivity()));
+        rv = (RecyclerView) findViewById(R.id.recycler_view_berkas);
+        final String id_lowongan = getIntent().getStringExtra("lowongan_id");
+        rv.setLayoutManager(new LinearLayoutManager(FavoritList.this));
         FirebaseUser user = mAuth.getCurrentUser();
         final String userID = user.getUid();
-        myRef = database.getReference().child("Lowongan_pekerjaan");
+        myRef = database.getReference().child("berkas");
         databaseUser = database.getReference();
-        mFirebaseAdapter = new FirebaseRecyclerAdapter<LowonganPekerjaan, LowonganPekerjaanAdapter>(LowonganPekerjaan.class, R.layout.layout_item_pekerjaan, LowonganPekerjaanAdapter.class,myRef.orderByChild("pembuat_lowongan").equalTo(user.getUid())) {
+        mFirebaseAdapter = new FirebaseRecyclerAdapter<BerkasLamaran, BerkasLamaranAdapter>(BerkasLamaran.class, R.layout.layout_item_berkas_lamaran, BerkasLamaranAdapter.class,myRef.orderByChild("lowonganID_tanda").equalTo(id_lowongan+"_true")) {
             @Override
-            protected void populateViewHolder(final LowonganPekerjaanAdapter viewHolder, final LowonganPekerjaan model, final int position) {
-                long available = model.getTanggal_terbit();
-                long expired = model.getBatas_pengiriman();
-                Calendar date = Calendar.getInstance();
-                long millisecondsDate = date.getTimeInMillis();
-                int day= (int) TimeUnit.MILLISECONDS.toDays(millisecondsDate-available);
-                viewHolder.setBatasPengiriman(day);
-                viewHolder.setLowongan(model.getPosisi_lowong());
+            protected void populateViewHolder(final BerkasLamaranAdapter viewHolder, final BerkasLamaran model, final int position) {
                 // databaseUser.child(model.getPembuat_lowongan());
-                databaseUser.child("User").child(model.getPembuat_lowongan()).addValueEventListener(new ValueEventListener() {
+                //String pembuatBerkas = model.getEmail_pelamar();
+                Log.d(TAG, "Value haha: " + model.getId_pelamar());
+                databaseUser.child("User").addListenerForSingleValueEvent(new ValueEventListener() {
                     // myRef.addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
@@ -73,11 +66,15 @@ public class LowonganPekerjaanPersonalia extends Fragment {
                         //     String aa = childSnapshot.getKey(); // buat dapat key kode
                         // ProfilPengguna person = childSnapshot.getValue(ProfilPengguna.class);
                         // String value = dataSnapshot.getValue(String.class);
-                        User personalia = dataSnapshot.getValue(User.class);
-                        String sgetNama =personalia.getNama();
-                        String sgetGambar =personalia.getPhoto_profil();
-                        viewHolder.setNamaPerusahaan(sgetNama);
+                        Log.d(TAG, "Value haha5234: " + model.getId_pelamar());
+                        User pelamar = dataSnapshot.child(model.getId_pelamar()).getValue(User.class);
+
+                        String sgetNama =pelamar.getNama();
+                        String sgetGambar =pelamar.getPhoto_profil();
+                        String sgetEmail = model.getEmail_pelamar();
+                        viewHolder.setNama(sgetNama);
                         viewHolder.setLink_gambar(sgetGambar);
+                        viewHolder.setEmail(sgetEmail);
                         //Log.d(TAG, "Value is: " + aa);
                     }
                     @Override
@@ -104,31 +101,24 @@ public class LowonganPekerjaanPersonalia extends Fragment {
                                 // String value = dataSnapshot.getValue(String.class);
 
                                 //LowonganPekerjaan  = dataSnapshot.getValue(LowonganPekerjaan.class);
-                                posisiLowong =dataSnapshot.child("Lowongan_pekerjaan").child(abu).getValue(LowonganPekerjaan.class).getPosisi_lowong();
-                                deskripsi =dataSnapshot.child("Lowongan_pekerjaan").child(abu).getValue(LowonganPekerjaan.class).getDeskripsi();
-                                tanggalTerbit =dataSnapshot.child("Lowongan_pekerjaan").child(abu).getValue(LowonganPekerjaan.class).getTanggal_terbit();
-                                batasPengiriman =dataSnapshot.child("Lowongan_pekerjaan").child(abu).getValue(LowonganPekerjaan.class).getBatas_pengiriman();
-                                String pembuatLowongan =dataSnapshot.child("Lowongan_pekerjaan").child(abu).getValue(LowonganPekerjaan.class).getPembuat_lowongan();
+
+                                String pembuatBerkas =dataSnapshot.child("berkas").child(abu).getValue(BerkasLamaran.class).getId_pelamar();
                                 //Log.d(TAG, "Value is: " + aa);
-                                getNama =dataSnapshot.child("User").child(pembuatLowongan).getValue(User.class).getNama();
-                                getGambar =dataSnapshot.child("User").child(pembuatLowongan).getValue(User.class).getDeskripsi();
-                                link_video = dataSnapshot.child("User").child(pembuatLowongan).getValue(User.class).getVideo_id();
-                                String jenis_pengguna = dataSnapshot.child("User").child(pembuatLowongan).getValue(User.class).getJenis_pengguna();
-                                Log.d(TAG, "nyobaaaaa aja"+jenis_pengguna);
-                                SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-                                String rawTanggalTerbit = formatter.format(new Date(tanggalTerbit));
-                                String rawBatasKiriman = formatter.format(new Date(batasPengiriman));
-                                Intent intent = new Intent(getActivity(), DetailLowongan.class);
-                                Log.d(TAG, "Value is: " + rawBatasKiriman);
-                                intent.putExtra("tanggal_terbit",rawTanggalTerbit);
-                                intent.putExtra("batas_kiriman", rawBatasKiriman);
-                                intent.putExtra("deskripsi_lowongan", deskripsi);
-                                intent.putExtra("posisi_lowong",posisiLowong);
+                                getNama =dataSnapshot.child("User").child(pembuatBerkas).getValue(User.class).getNama();
+                                getGambar =dataSnapshot.child("User").child(pembuatBerkas).getValue(User.class).getPhoto_profil();
+                                email_pelamar = model.getEmail_pelamar();
+                                link_video = model.getLink_video();
+                                link_dokumen = model.getLink_dokumen();
+                                boolean tanda = model.isTanda();
+                                Intent intent = new Intent(FavoritList.this, DetailBerkas.class);
                                 intent.putExtra("nama_perusahaan",getNama);
                                 intent.putExtra("gambar_perusahaan",getGambar);
                                 intent.putExtra("link_video",link_video);
-                                intent.putExtra("lowongan_id",abu);
-                                intent.putExtra("jenis_pengguna",jenis_pengguna);
+                                intent.putExtra("link_dokumen",link_dokumen);
+                                intent.putExtra("email_pelamar",email_pelamar);
+                                intent.putExtra("tanda", tanda);
+                                intent.putExtra("berkasID",abu);
+                                intent.putExtra("lowonganID",id_lowongan);
                                 startActivity(intent);
                             }
                             @Override
@@ -161,15 +151,10 @@ public class LowonganPekerjaanPersonalia extends Fragment {
         };
 
         rv.setAdapter(mFirebaseAdapter);
-
-        return vw;
     }
 
-    public void onStart() {
-        super.onStart();
-
+    public boolean onSupportNavigateUp(){
+        finish();
+        return true;
     }
-
-
-
 }

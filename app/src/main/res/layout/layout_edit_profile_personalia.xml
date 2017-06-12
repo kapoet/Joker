@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#c6adadad"
+    android:background="#faf5f7"
     android:orientation="vertical">
 
 
@@ -25,7 +25,7 @@
                 android:layout_marginLeft="8dp"
                 android:layout_marginRight="8dp"
                 android:layout_marginTop="20dp"
-                android:src="@drawable/camera_upload"
+                android:src="@drawable/ic_menu_camera"
                 app:civ_border_color="#FF000000"
                 app:civ_border_width="2dp"
                 app:layout_constraintLeft_toLeftOf="parent"
@@ -45,23 +45,20 @@
 
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="12dp"
-                android:orientation="horizontal"
+                android:orientation="vertical"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/iv_sign_up_personaloa_photo">
 
-                <FrameLayout
+                <TextView
+                    android:id="@+id/textView20"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="#993d67a2">
-
-                    <ImageView
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
-                        android:padding="16dp"
-                        android:src="@drawable/layer2" />
-                </FrameLayout>
+                    android:layout_weight="1"
+                    android:text="Alamat E-mail baru :"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+                    android:textStyle="bold" />
 
                 <EditText
                     android:id="@+id/edt_edit_profile_email"
@@ -72,7 +69,7 @@
                     android:inputType="textEmailAddress"
                     android:padding="16dp"
                     android:singleLine="true"
-                    android:textColor="#fff"
+                    android:textColor="@color/common_google_signin_btn_text_dark_focused"
                     android:textColorHint="#fff"
 
                     android:textSize="14dp" />
@@ -90,27 +87,24 @@
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="13dp"
                 android:layout_weight="1"
-                android:orientation="horizontal"
+                android:orientation="vertical"
                 app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/linearLayout">
 
-                <FrameLayout
+                <TextView
+                    android:id="@+id/textView21"
                     android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:background="#993d67a2">
-
-                    <ImageView
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
-                        android:padding="16dp"
-                        android:src="@drawable/layer4" />
-                </FrameLayout>
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Password baru :"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+                    android:textStyle="bold" />
 
                 <EditText
                     android:id="@+id/edt_edit_profile_password"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:background="#995381c1"
@@ -118,7 +112,7 @@
                     android:inputType="textPassword"
                     android:padding="16dp"
                     android:singleLine="true"
-                    android:textColor="#fff"
+                    android:textColor="@color/common_google_signin_btn_text_dark_focused"
 
                     android:textColorHint="#fff"
                     android:textSize="14dp"
@@ -135,22 +129,19 @@
                 android:layout_marginLeft="8dp"
                 android:layout_marginRight="8dp"
                 android:layout_marginTop="10dp"
-                android:orientation="horizontal"
+                android:orientation="vertical"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/linearLayout2">
 
-                <FrameLayout
+                <TextView
+                    android:id="@+id/textView22"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="#993d67a2">
-
-                    <ImageView
-                        android:id="@+id/imageView2"
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
-                        app:srcCompat="@drawable/user" />
-                </FrameLayout>
+                    android:layout_weight="1"
+                    android:text="Nama Perusahaan :"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+                    android:textStyle="bold" />
 
                 <EditText
                     android:id="@+id/edt_edit_profile_nama"
@@ -162,6 +153,7 @@
                     android:hint="Nama Perushaan"
                     android:inputType="textPersonName"
                     android:padding="16dp"
+                    android:textColor="@color/common_google_signin_btn_text_dark_focused"
                     android:textColorHint="@android:color/background_light"
                     android:textSize="14dp" />
 
@@ -174,35 +166,32 @@
                 android:layout_marginLeft="8dp"
                 android:layout_marginRight="8dp"
                 android:layout_marginTop="11dp"
-                android:orientation="horizontal"
+                android:orientation="vertical"
                 app:layout_constraintLeft_toLeftOf="parent"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/linearLayout3">
 
-                <FrameLayout
+                <TextView
+                    android:id="@+id/textView23"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="#993d67a2">
-
-                    <ImageView
-                        android:id="@+id/imageView6"
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
-                        android:layout_gravity="center_vertical"
-                        app:srcCompat="@drawable/description" />
-                </FrameLayout>
+                    android:layout_weight="1"
+                    android:text="Deskripsi Perusahaan :"
+                    android:textAppearance="@style/TextAppearance.AppCompat.Headline"
+                    android:textStyle="bold" />
 
                 <EditText
                     android:id="@+id/edt_edit_profile_deskripsi"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="175dp"
                     android:layout_weight="1"
                     android:background="#995381c1"
                     android:ems="10"
+                    android:gravity="top"
                     android:hint="Deskripsi Perusahaan"
                     android:inputType="textMultiLine"
                     android:padding="16dp"
-                    android:textColor="@android:color/background_light"
+                    android:textColor="@color/common_google_signin_btn_text_dark_focused"
                     android:textColorHint="@android:color/background_light"
                     android:textSize="14sp"
                     tools:layout_editor_absoluteX="67dp"
@@ -232,7 +221,7 @@
                     android:hint="Video ID"
                     android:inputType="none"
                     android:padding="16dp"
-                    android:textColor="@android:color/background_light"
+                    android:textColor="@color/common_google_signin_btn_text_dark_focused"
                     android:textColorHint="@android:color/background_light"
                     android:textSize="14sp" />
 

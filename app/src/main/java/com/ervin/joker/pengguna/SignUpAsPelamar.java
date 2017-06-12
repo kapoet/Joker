@@ -1,6 +1,6 @@
-package com.ervin.joker;
+package com.ervin.joker.pengguna;
 
-import android.annotation.TargetApi;
+import android.Manifest;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -9,7 +9,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -19,7 +18,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.ervin.joker.video.*;
+import com.ervin.joker.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -49,7 +48,7 @@ public class SignUpAsPelamar extends AppCompatActivity {
     EditText edtEmail, edtPassword, edtNama, edtDescription, edtVideo;
     Button btnRegister;
     ImageView ivGambarProfile, ivUploadVideo;
-    Uri rawPathImage;
+    Uri rawPathImage=null;
     String pathImage;
     String linkPhoto;
     private FirebaseAuth mAuth;
@@ -60,10 +59,11 @@ public class SignUpAsPelamar extends AppCompatActivity {
     private static final int GET_DATA = 7;
     private FirebaseAuth.AuthStateListener mAuthListener;
     String jenis_pengguna = "Pelamar_pekerjaan";
+    boolean gambar = false;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.layout_sign_up_pelamar);
+        setContentView(com.ervin.joker.R.layout.layout_sign_up_pelamar);
         edtEmail = (EditText) findViewById(R.id.edt_sign_up_pelamar_email);
         edtNama = (EditText) findViewById(R.id.edt_sign_up_pelamar_nama);
         edtPassword = (EditText) findViewById(R.id.edt_sign_up_pelamar_password);
@@ -86,47 +86,54 @@ public class SignUpAsPelamar extends AppCompatActivity {
                 String password = edtPassword.getText().toString();
                 final String deskripsi = "khkh";
                 final String video = "gkgkgkgkgkg";
-                mAuth.createUserWithEmailAndPassword(email, password)
-                        .addOnCompleteListener(SignUpAsPelamar.this, new OnCompleteListener<AuthResult>() {
-                            @Override
-                            public void onComplete(@NonNull Task<AuthResult> task) {
-                                Log.d(TAG, "createUserWithEmail:onComplete:" + task.isSuccessful());
-                                if (!task.isSuccessful()) {
-                                    progressDialog.dismiss();
-                                    Toast.makeText(SignUpAsPelamar.this, "Periksa Koneksi Anda",
-                                            Toast.LENGTH_SHORT).show();
-                                } else {
-                                    //Uri file = Uri.fromFile(new File(pathImage));
-                                    //String filename=pathImage.substring(pathImage.lastIndexOf("/")+1);
-                                    final FirebaseUser user = mAuth.getCurrentUser();
-                                    StorageReference riversRef = mStorageRef.child("images/"+user.getUid()+"/"+"phto_profile.jpg");
-                                    riversRef.putFile(rawPathImage)
-                                            .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                                                @Override
-                                                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                                    // Get a URL to the uploaded content
-                                                    @SuppressWarnings("VisibleForTests")
-                                                    Uri downloadUrl = taskSnapshot.getDownloadUrl();
-                                                    linkPhoto = String.valueOf(downloadUrl);
-                                                    User pelamar = new User(nama, linkPhoto, jenis_pengguna);
-                                                    myRef.child("User").child(user.getUid()).setValue(pelamar);
-                                                    progressDialog.dismiss();
-                                                }
-                                            })
-                                            .addOnFailureListener(new OnFailureListener() {
-                                                @Override
-                                                public void onFailure(@NonNull Exception exception) {
-                                                    progressDialog.dismiss();
-                                                    // Handle unsuccessful uploads
-                                                    // ...
-                                                }
-                                            });
+                if (email.isEmpty() || password.isEmpty() || nama.isEmpty() || gambar==false) {
+                    Toast.makeText(SignUpAsPelamar.this, "Isikan semua field yang ada",
+                            Toast.LENGTH_SHORT).show();
+                    progressDialog.dismiss();
+                } else {
+                    mAuth.createUserWithEmailAndPassword(email, password)
+                            .addOnCompleteListener(SignUpAsPelamar.this, new OnCompleteListener<AuthResult>() {
+                                @Override
+                                public void onComplete(@NonNull Task<AuthResult> task) {
+                                    Log.d(TAG, "createUserWithEmail:onComplete:" + task.isSuccessful());
+                                    if (!task.isSuccessful()) {
+                                        progressDialog.dismiss();
+                                        Toast.makeText(SignUpAsPelamar.this, "Akun tersebut telah terdaftar",
+                                                Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        //Uri file = Uri.fromFile(new File(pathImage));
+                                        //String filename=pathImage.substring(pathImage.lastIndexOf("/")+1);
+                                        final FirebaseUser user = mAuth.getCurrentUser();
+                                        StorageReference riversRef = mStorageRef.child("images/" + user.getUid() + "/" + "phto_profile.jpg");
+                                        riversRef.putFile(rawPathImage)
+                                                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                                    @Override
+                                                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                                        // Get a URL to the uploaded content
+                                                        @SuppressWarnings("VisibleForTests")
+                                                        Uri downloadUrl = taskSnapshot.getDownloadUrl();
+                                                        linkPhoto = String.valueOf(downloadUrl);
+                                                        User pelamar = new User(nama, linkPhoto, jenis_pengguna);
+                                                        myRef.child("User").child(user.getUid()).setValue(pelamar);
+                                                        progressDialog.dismiss();
+                                                    }
+                                                })
+                                                .addOnFailureListener(new OnFailureListener() {
+                                                    @Override
+                                                    public void onFailure(@NonNull Exception exception) {
+                                                        mAuth.signOut();
+                                                        progressDialog.dismiss();
+                                                        // Handle unsuccessful uploads
+                                                        // ...
+                                                    }
+                                                });
 
+                                    }
+
+                                    // ...
                                 }
-
-                                // ...
-                            }
-                        });
+                            });
+                }
             }
         });
 
@@ -149,7 +156,7 @@ public class SignUpAsPelamar extends AppCompatActivity {
                 if (user != null) {
                     // User is signed in
                     Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
-                    Intent intent = new Intent(SignUpAsPelamar.this, MainActivity.class);
+                    Intent intent = new Intent(SignUpAsPelamar.this, com.ervin.joker.MainActivity.class);
                     intent.putExtra("pengguna",jenis_pengguna);
                     startActivity(intent);
                 } else {
@@ -174,7 +181,9 @@ public class SignUpAsPelamar extends AppCompatActivity {
                         rawPathImage= uri;
                     }
                     // pathImage = rawPathImage.replaceAll("file://","");// untuk menghilangkan "file//" pada path gambar
+
                     Glide.with(this).load(rawPathImage).into(ivGambarProfile);
+                    gambar=true;
                 }
                 break;
             case GET_DATA:
@@ -186,13 +195,20 @@ public class SignUpAsPelamar extends AppCompatActivity {
         }
 
     }
-    @TargetApi(Build.VERSION_CODES.M)
+
     private void checkFilePermissions() {
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
-            int permissionCheck = SignUpAsPelamar.this.checkSelfPermission("Manifest.permission.READ_EXTERNAL_STORAGE");
-            permissionCheck += SignUpAsPelamar.this.checkSelfPermission("Manifest.permission.WRITE_EXTERNAL_STORAGE");
+            int permissionCheck = 0;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                permissionCheck =SignUpAsPelamar.this.checkSelfPermission("Manifest.permission.READ_EXTERNAL_STORAGE");
+            }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                permissionCheck += SignUpAsPelamar.this.checkSelfPermission("Manifest.permission.WRITE_EXTERNAL_STORAGE");
+            }
             if (permissionCheck != 0) {
-                this.requestPermissions(new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE, android.Manifest.permission.READ_EXTERNAL_STORAGE}, 1001); //Any number
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    this.requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, 1001); //Any number
+                }
             }
         } else {
             Log.d(TAG, "checkBTPermissions: No need to check permissions. SDK version < LOLLIPOP.");

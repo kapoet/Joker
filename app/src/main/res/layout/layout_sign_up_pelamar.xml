@@ -7,14 +7,28 @@
     android:background="@drawable/background_pelamar"
     android:orientation="vertical">
 
-    <android.support.constraint.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#c6adadad">
+        android:background="#c6adadad"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/iv_sign_up_pelamar_gambar"
+            android:layout_width="96dp"
+            android:layout_height="96dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_marginTop="8dp"
+            android:src="@drawable/camera_upload"
+            app:civ_border_color="#FF000000"
+            app:civ_border_width="2dp" />
 
         <LinearLayout
             android:id="@+id/linearLayout"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
 
 
             android:layout_height="wrap_content"
@@ -23,12 +37,7 @@
             android:layout_marginRight="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="24dp"
-            android:orientation="horizontal"
-
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/iv_sign_up_pelamar_gambar">
+            android:orientation="horizontal">
 
             <FrameLayout
                 android:layout_width="wrap_content"
@@ -47,7 +56,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="#995381c1"
-                android:hint="Email Address"
+                android:hint="Alamat Email"
                 android:inputType="textEmailAddress"
                 android:padding="16dp"
                 android:singleLine="true"
@@ -60,7 +69,7 @@
 
         <LinearLayout
             android:id="@+id/linearLayout2"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginEnd="8dp"
 
@@ -68,11 +77,7 @@
             android:layout_marginRight="8dp"
             android:layout_marginStart="8dp"
             android:layout_marginTop="16dp"
-            android:layout_weight="1"
-            android:orientation="horizontal"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/linearLayout">
+            android:orientation="horizontal">
 
             <FrameLayout
                 android:layout_width="wrap_content"
@@ -92,7 +97,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="#995381c1"
-                android:hint="Password"
+                android:hint="Sandi minimal 8 karakter"
                 android:inputType="textPassword"
                 android:padding="16dp"
                 android:singleLine="true"
@@ -106,15 +111,12 @@
 
         <LinearLayout
             android:id="@+id/linearLayout3"
-            android:layout_width="344dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="18dp"
-            android:orientation="horizontal"
-            app:layout_constraintTop_toBottomOf="@+id/linearLayout2"
             android:layout_marginLeft="8dp"
-            app:layout_constraintLeft_toLeftOf="parent"
             android:layout_marginRight="8dp"
-            app:layout_constraintRight_toRightOf="parent">
+            android:layout_marginTop="18dp"
+            android:orientation="horizontal">
 
             <FrameLayout
                 android:layout_width="wrap_content"
@@ -145,34 +147,16 @@
         </LinearLayout>
 
 
-        <de.hdodenhof.circleimageview.CircleImageView
-            xmlns:app="http://schemas.android.com/apk/res-auto"
-            android:id="@+id/iv_sign_up_pelamar_gambar"
-            android:layout_width="96dp"
-            android:layout_height="96dp"
-            android:src="@drawable/camera_upload"
-            app:civ_border_width="2dp"
-            app:civ_border_color="#FF000000"
-            app:layout_constraintTop_toTopOf="parent"
-            android:layout_marginTop="8dp"
-            android:layout_marginLeft="8dp"
-            app:layout_constraintLeft_toLeftOf="parent"
-            android:layout_marginRight="8dp"
-            app:layout_constraintRight_toRightOf="parent" />
         <Button
             android:id="@+id/btn_signup_pelamar"
             android:layout_width="344dp"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="8dp"
             android:layout_marginTop="12dp"
             android:background="#e12e6b"
             android:text="Daftar"
-            android:textColor="@android:color/background_light"
-            app:layout_constraintTop_toBottomOf="@+id/linearLayout3"
-            android:layout_marginLeft="8dp"
-            app:layout_constraintLeft_toLeftOf="parent"
-            android:layout_marginRight="8dp"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintHorizontal_bias="0.0" />
+            android:textColor="@android:color/background_light" />
 
-    </android.support.constraint.ConstraintLayout>
+    </LinearLayout>
 </LinearLayout>

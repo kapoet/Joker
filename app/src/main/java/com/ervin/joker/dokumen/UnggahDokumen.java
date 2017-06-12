@@ -1,4 +1,4 @@
-package com.ervin.joker;
+package com.ervin.joker.dokumen;
 
 import android.content.Intent;
 import android.net.Uri;
@@ -12,8 +12,8 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.ervin.joker.R;
 import com.firebase.ui.database.FirebaseListAdapter;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -94,7 +94,11 @@ public class UnggahDokumen extends AppCompatActivity {
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
                 Dokumen itemRef = mAdapter.getItem(position);
                 String link_dokumen = itemRef.getLink_dokumen();
-                Toast.makeText(getApplicationContext(), "List Item Value: "+link_dokumen, Toast.LENGTH_LONG).show();
+                Intent intent = new Intent();
+                intent.putExtra("link", itemRef.getLink_dokumen());
+                intent.putExtra("nama", itemRef.getNama_dokumen());
+                setResult(RESULT_OK, intent);
+                finish();
             }
         });
         pickup.setOnClickListener(new View.OnClickListener() {

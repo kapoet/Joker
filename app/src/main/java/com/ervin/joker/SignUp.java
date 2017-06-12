@@ -7,6 +7,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 
+import com.ervin.joker.pengguna.SignUpAsPelamar;
+import com.ervin.joker.pengguna.SignUpAsPersonalia;
+
 /**
  * Created by ervin on 5/30/2017.
  */

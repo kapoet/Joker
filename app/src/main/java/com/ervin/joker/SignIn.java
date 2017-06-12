@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.ervin.joker.pengguna.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -43,7 +44,9 @@ public class SignIn extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         final DatabaseReference myRef = database.getReference();
-
+        if (getIntent().getExtras() != null && getIntent().getExtras().getBoolean("EXIT", false)) {
+            finish();
+        }
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
@@ -51,7 +54,6 @@ public class SignIn extends AppCompatActivity {
                 if (user != null) {
                     // User is signed in
                     Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
-                    Toast.makeText(SignIn.this,"onAuthStateChanged:signed_in:" + user.getUid(), Toast.LENGTH_SHORT).show();
                     myRef.child("User").child(user.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
@@ -76,7 +78,7 @@ public class SignIn extends AppCompatActivity {
                     });
                 } else {
                     // User is signed out
-                    Toast.makeText(SignIn.this,"Silahkan isi semua field yang ada", Toast.LENGTH_SHORT).show();
+
                     Log.d(TAG, "onAuthStateChanged:signed_out");
                 }
                 // ...
@@ -88,14 +90,28 @@ public class SignIn extends AppCompatActivity {
             public void onClick(View v) {
                 String email = edtEmail.getText().toString();
                 String password = edtPassword.getText().toString();
-                mAuth.signInWithEmailAndPassword(email, password);
 
                 if(email.isEmpty()||password.isEmpty()){
                     Toast.makeText(SignIn.this,"Silahkan isi semua field yang ada", Toast.LENGTH_SHORT).show();
-
                 } else {
+                    mAuth.signInWithEmailAndPassword(email, password)
+                            .addOnCompleteListener(SignIn.this, new OnCompleteListener<AuthResult>() {
+                                @Override
+                                public void onComplete(@NonNull Task<AuthResult> task) {
+                                    Log.d(TAG, "signInWithEmail:onComplete:" + task.isSuccessful());
 
-                    Log.d(TAG, "onAuthStateChanged:signed_out "+email+" "+password);
+                                    // If sign in fails, display a message to the user. If sign in succeeds
+                                    // the auth state listener will be notified and logic to handle the
+                                    // signed in user can be handled in the listener.
+                                    if (!task.isSuccessful()) {
+                                        String a = "Email/Password yang anda masukkan salah";
+                                        Toast.makeText(SignIn.this,a,
+                                                Toast.LENGTH_SHORT).show();
+                                    }
+
+                                    // ...
+                                }
+                            });
                 }
             }
         });
@@ -118,5 +134,9 @@ public class SignIn extends AppCompatActivity {
         if (mAuthListener != null) {
             mAuth.removeAuthStateListener(mAuthListener);
         }
+    }
+
+    public void onBackPressed() {
+        finishAffinity();
     }
 }

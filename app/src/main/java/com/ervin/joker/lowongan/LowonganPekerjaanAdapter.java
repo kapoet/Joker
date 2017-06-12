@@ -1,4 +1,4 @@
-package com.ervin.joker;
+package com.ervin.joker.lowongan;
 
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -7,12 +7,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
+import com.ervin.joker.R;
 
 /**
  * Created by ervin on 6/3/2017.
  */
 
-class LowonganPekerjaanAdapter extends RecyclerView.ViewHolder{
+public class LowonganPekerjaanAdapter extends RecyclerView.ViewHolder{
     private final TextView batas_pengiriman, lowongan, nama_perusahaan, deskripsi_lowongan;
     private final ImageView gambar_perusahaan;
 
@@ -33,7 +34,11 @@ class LowonganPekerjaanAdapter extends RecyclerView.ViewHolder{
         deskripsi_lowongan.setText(deskripsiPerusahaan);
     }
     public void setBatasPengiriman(int batas) {
-        batas_pengiriman.setText( "Diposting "+batas+" hari yang lalu");
+        if (batas == 0) {
+            batas_pengiriman.setText("Diposting baru saja");
+        } else {
+            batas_pengiriman.setText("Diposting " + batas + " hari yang lalu");
+        }
     }
 
     public void setLowongan(String lowong) {

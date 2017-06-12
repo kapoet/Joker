@@ -287,13 +287,20 @@ public class MainActivity extends AppCompatActivity implements
             // mHandler.removeCallbacksAndMessages(null);
         }
     }
-    @TargetApi(Build.VERSION_CODES.M)
+
     private void checkFilePermissions() {
         if(Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP){
-            int permissionCheck = MainActivity.this.checkSelfPermission("Manifest.permission.GET_ACCOUNTS");
-            permissionCheck += MainActivity.this.checkSelfPermission("Manifest.permission.CAMERA");
+            int permissionCheck = 0;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                permissionCheck =MainActivity.this.checkSelfPermission("Manifest.permission.GET_ACCOUNTS");
+            }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                permissionCheck += MainActivity.this.checkSelfPermission("Manifest.permission.CAMERA");
+            }
             if (permissionCheck != 0) {
-                this.requestPermissions(new String[]{android.Manifest.permission.GET_ACCOUNTS, Manifest.permission.CAMERA}, 1001); //Any number
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    this.requestPermissions(new String[]{Manifest.permission.GET_ACCOUNTS, Manifest.permission.CAMERA}, 1001); //Any number
+                }
             }
         }else{
             Log.d(TAG, "checkBTPermissions: No need to check permissions. SDK version < LOLLIPOP.");

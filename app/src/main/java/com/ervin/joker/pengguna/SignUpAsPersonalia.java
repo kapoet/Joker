@@ -1,6 +1,6 @@
-package com.ervin.joker;
+package com.ervin.joker.pengguna;
 
-import android.annotation.TargetApi;
+import android.Manifest;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -9,7 +9,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -19,7 +18,8 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.ervin.joker.video.*;
+import com.ervin.joker.*;
+import com.ervin.joker.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -60,10 +60,11 @@ public class SignUpAsPersonalia extends AppCompatActivity {
     private static final int GET_DATA = 7;
     private FirebaseAuth.AuthStateListener mAuthListener;
     String jenis_pengguna = "Personalia";
+    boolean gambar=false;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.layout_sign_up_personalia);
+        setContentView(com.ervin.joker.R.layout.layout_sign_up_personalia);
         edtEmail = (EditText) findViewById(R.id.edt_sign_up_personaloa_email);
         edtNama = (EditText) findViewById(R.id.edt_sign_up_personaloa_nama);
         edtPassword = (EditText) findViewById(R.id.edt_sign_up_personaloa_password);
@@ -88,47 +89,54 @@ public class SignUpAsPersonalia extends AppCompatActivity {
                 String password = edtPassword.getText().toString();
                 final String deskripsi = edtDescription.getText().toString();
                 final String video = edtVideo.getText().toString();
-                mAuth.createUserWithEmailAndPassword(email, password)
-                        .addOnCompleteListener(SignUpAsPersonalia.this, new OnCompleteListener<AuthResult>() {
-                            @Override
-                            public void onComplete(@NonNull Task<AuthResult> task) {
-                                Log.d(TAG, "createUserWithEmail:onComplete:" + task.isSuccessful());
-                                if (!task.isSuccessful()) {
-                                    progressDialog.dismiss();
-                                    Toast.makeText(SignUpAsPersonalia.this, "Periksa Koneksi Anda",
-                                            Toast.LENGTH_SHORT).show();
-                                } else {
-                                    //Uri file = Uri.fromFile(new File(pathImage));
-                                    //String filename=pathImage.substring(pathImage.lastIndexOf("/")+1);
-                                    final FirebaseUser user = mAuth.getCurrentUser();
-                                    StorageReference riversRef = mStorageRef.child("images/"+user.getUid()+"/"+"phto_profile.jpg");
-                                    riversRef.putFile(rawPathImage)
-                                            .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                                                @Override
-                                                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                                    // Get a URL to the uploaded content
-                                                    @SuppressWarnings("VisibleForTests")
-                                                    Uri downloadUrl = taskSnapshot.getDownloadUrl();
-                                                    linkPhoto = String.valueOf(downloadUrl);
-                                                    User pelamar = new User(nama, linkPhoto, jenis_pengguna, deskripsi, video);
-                                                    myRef.child("User").child(user.getUid()).setValue(pelamar);
-                                                    progressDialog.dismiss();
-                                                }
-                                            })
-                                            .addOnFailureListener(new OnFailureListener() {
-                                                @Override
-                                                public void onFailure(@NonNull Exception exception) {
-                                                    progressDialog.dismiss();
-                                                    // Handle unsuccessful uploads
-                                                    // ...
-                                                }
-                                            });
+                if (email.isEmpty() || password.isEmpty() || nama.isEmpty() || gambar==false||deskripsi.isEmpty()||video.isEmpty()) {
+                    Toast.makeText(SignUpAsPersonalia.this, "Isikan semua field yang ada",
+                            Toast.LENGTH_SHORT).show();
+                    progressDialog.dismiss();
+                } else {
+                    mAuth.createUserWithEmailAndPassword(email, password)
+                            .addOnCompleteListener(SignUpAsPersonalia.this, new OnCompleteListener<AuthResult>() {
+                                @Override
+                                public void onComplete(@NonNull Task<AuthResult> task) {
+                                    Log.d(TAG, "createUserWithEmail:onComplete:" + task.isSuccessful());
+                                    if (!task.isSuccessful()) {
+                                        progressDialog.dismiss();
+                                        Toast.makeText(SignUpAsPersonalia.this, "Periksa Koneksi Anda",
+                                                Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        //Uri file = Uri.fromFile(new File(pathImage));
+                                        //String filename=pathImage.substring(pathImage.lastIndexOf("/")+1);
+                                        final FirebaseUser user = mAuth.getCurrentUser();
+                                        StorageReference riversRef = mStorageRef.child("images/" + user.getUid() + "/" + "phto_profile.jpg");
+                                        riversRef.putFile(rawPathImage)
+                                                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                                    @Override
+                                                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                                        // Get a URL to the uploaded content
+                                                        @SuppressWarnings("VisibleForTests")
+                                                        Uri downloadUrl = taskSnapshot.getDownloadUrl();
+                                                        linkPhoto = String.valueOf(downloadUrl);
+                                                        User pelamar = new User(nama, linkPhoto, jenis_pengguna, deskripsi, video);
+                                                        myRef.child("User").child(user.getUid()).setValue(pelamar);
+                                                        progressDialog.dismiss();
+                                                    }
+                                                })
+                                                .addOnFailureListener(new OnFailureListener() {
+                                                    @Override
+                                                    public void onFailure(@NonNull Exception exception) {
+                                                        mAuth.signOut();
+                                                        progressDialog.dismiss();
+                                                        // Handle unsuccessful uploads
+                                                        // ...
+                                                    }
+                                                });
 
+                                    }
+
+                                    // ...
                                 }
-
-                                // ...
-                            }
-                        });
+                            });
+                }
             }
         });
 
@@ -183,6 +191,7 @@ public class SignUpAsPersonalia extends AppCompatActivity {
                     }
                    // pathImage = rawPathImage.replaceAll("file://","");// untuk menghilangkan "file//" pada path gambar
                     Glide.with(this).load(rawPathImage).into(ivGambarProfile);
+                    gambar = true;
                 }
                 break;
             case GET_DATA:
@@ -194,13 +203,20 @@ public class SignUpAsPersonalia extends AppCompatActivity {
         }
 
     }
-    @TargetApi(Build.VERSION_CODES.M)
+
     private void checkFilePermissions() {
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP) {
-            int permissionCheck = SignUpAsPersonalia.this.checkSelfPermission("Manifest.permission.READ_EXTERNAL_STORAGE");
-            permissionCheck += SignUpAsPersonalia.this.checkSelfPermission("Manifest.permission.WRITE_EXTERNAL_STORAGE");
+            int permissionCheck = 0;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                permissionCheck =SignUpAsPersonalia.this.checkSelfPermission("Manifest.permission.READ_EXTERNAL_STORAGE");
+            }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                permissionCheck += SignUpAsPersonalia.this.checkSelfPermission("Manifest.permission.WRITE_EXTERNAL_STORAGE");
+            }
             if (permissionCheck != 0) {
-                this.requestPermissions(new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE, android.Manifest.permission.READ_EXTERNAL_STORAGE}, 1001); //Any number
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    this.requestPermissions(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, 1001); //Any number
+                }
             }
         } else {
             Log.d(TAG, "checkBTPermissions: No need to check permissions. SDK version < LOLLIPOP.");

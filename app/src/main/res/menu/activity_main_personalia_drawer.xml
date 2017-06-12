@@ -4,33 +4,22 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_camera"
-            android:icon="@drawable/ic_menu_camera"
-            android:title="Lowongan Pekerjaan" />
-        <item
-            android:id="@+id/nav_gallery"
-            android:icon="@drawable/ic_menu_gallery"
-            android:title="Edit Lowongan" />
-        <item
-            android:id="@+id/nav_slideshow"
-            android:icon="@drawable/ic_menu_slideshow"
-            android:title="logout" />
+            android:icon="@drawable/job"
+            android:title="Lowongan Saya" />
         <item
             android:id="@+id/nav_manage"
-            android:icon="@drawable/ic_menu_manage"
+            android:icon="@drawable/add"
             android:title="Tambah Lowongan" />
+        <item
+            android:id="@+id/nav_share"
+            android:icon="@drawable/edit"
+            android:title="Edit Profile" />
+        <item
+            android:id="@+id/nav_slideshow"
+            android:icon="@drawable/logut"
+            android:title="Logout" />
     </group>
 
-    <item android:title="Communicate">
-        <menu>
-            <item
-                android:id="@+id/nav_share"
-                android:icon="@drawable/ic_menu_share"
-                android:title="Edit Profile" />
-            <item
-                android:id="@+id/nav_send"
-                android:icon="@drawable/ic_menu_send"
-                android:title="Send" />
-        </menu>
-    </item>
+
 
 </menu>

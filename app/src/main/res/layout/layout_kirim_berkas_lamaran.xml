@@ -19,8 +19,9 @@
             android:layout_weight="1"
             android:ems="10"
             android:gravity="bottom"
-            android:hint="Pilih video "
-            android:inputType="textPersonName"
+            android:hint="Klik gambar untuk pilih video "
+            android:inputType="none|textPersonName"
+            android:singleLine="true"
             android:textColor="@color/common_google_signin_btn_text_dark_focused"
             android:textColorHint="@color/cardview_dark_background" />
 
@@ -45,8 +46,9 @@
             android:layout_weight="1"
             android:ems="10"
             android:gravity="bottom"
-            android:hint="Pilih dokumen CV"
-            android:inputType="textPersonName"
+            android:hint="Klik gambar untuk pilih CV"
+            android:inputType="none|textPersonName"
+            android:singleLine="true"
             android:textColor="@color/common_google_signin_btn_text_dark_focused"
             android:textColorHint="@color/cardview_dark_background" />
 
@@ -72,7 +74,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:text="Kirim berkas" />
+        android:text="Kirim berkas"
+        android:textColor="@color/common_google_signin_btn_text_dark_default" />
 
 
 </LinearLayout>
