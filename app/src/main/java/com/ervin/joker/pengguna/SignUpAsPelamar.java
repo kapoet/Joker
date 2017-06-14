@@ -87,7 +87,7 @@ public class SignUpAsPelamar extends AppCompatActivity {
                 final String deskripsi = "khkh";
                 final String video = "gkgkgkgkgkg";
                 if (email.isEmpty() || password.isEmpty() || nama.isEmpty() || gambar==false) {
-                    Toast.makeText(SignUpAsPelamar.this, "Isikan semua field yang ada",
+                    Toast.makeText(SignUpAsPelamar.this, "Pastikan telah memilih photo profile dan mengisi semua field yang ada",
                             Toast.LENGTH_SHORT).show();
                     progressDialog.dismiss();
                 } else {

@@ -77,7 +77,7 @@ public class ReviewActivity extends Activity {
             uploadIntent.setData(mFileUri);
             uploadIntent.putExtra(MainActivity.ACCOUNT_KEY, mChosenAccountName);
             startService(uploadIntent);
-            Toast.makeText(this, R.string.youtube_upload_started,
+            Toast.makeText(this, "Silahkan tunggu sampai proses mengunggah selesai",
                     Toast.LENGTH_LONG).show();
             // Go back to MainActivity after upload
             finish();

@@ -50,6 +50,8 @@ public class BerkasLamaranList extends AppCompatActivity {
             final String userID = user.getUid();
             myRef = database.getReference().child("berkas");
             databaseUser = database.getReference();
+        myRef.keepSynced(true);
+        databaseUser.keepSynced(true);
             mFirebaseAdapter = new FirebaseRecyclerAdapter<BerkasLamaran, BerkasLamaranAdapter>(BerkasLamaran.class, R.layout.layout_item_berkas_lamaran, BerkasLamaranAdapter.class,myRef.orderByChild("lowongan_id").equalTo(id_lowongan)) {
                 @Override
                 protected void populateViewHolder(final BerkasLamaranAdapter viewHolder, final BerkasLamaran model, final int position) {
@@ -110,6 +112,7 @@ public class BerkasLamaranList extends AppCompatActivity {
                                     link_video = model.getLink_video();
                                     link_dokumen = model.getLink_dokumen();
                                     boolean tanda = model.isTanda();
+                                    String idPelamar = model.getId_pelamar();
                                     Intent intent = new Intent(BerkasLamaranList.this, DetailBerkas.class);
                                     intent.putExtra("nama_perusahaan",getNama);
                                     intent.putExtra("gambar_perusahaan",getGambar);
@@ -119,6 +122,7 @@ public class BerkasLamaranList extends AppCompatActivity {
                                     intent.putExtra("tanda", tanda);
                                     intent.putExtra("berkasID",abu);
                                     intent.putExtra("lowonganID",id_lowongan);
+                                    intent.putExtra("pelamarID",idPelamar);
                                     startActivity(intent);
                                 }
                                 @Override

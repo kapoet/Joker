@@ -18,8 +18,9 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="4dp"
             android:fontFamily="sans-serif-condensed"
-            android:text="Pilih video untuk dikirimkan dalam berkas Lamaran"
-            android:textAppearance="?android:textAppearanceMedium"></TextView>
+            android:text="Video yang telah diunggah akan ditampilkan pada list dibawah. Pilih video dibawah untuk dikirimkan dalam berkas Lamaran"
+            android:textAppearance="?android:textAppearanceMedium"
+            android:textSize="15sp"></TextView>
     </LinearLayout>
 
     <FrameLayout

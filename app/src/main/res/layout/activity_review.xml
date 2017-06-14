@@ -35,7 +35,7 @@
             android:drawableTop="@drawable/ic_av_upload"
             android:ellipsize="end"
             android:fontFamily="sans-serif-condensed"
-            android:hint="@string/button_upload"
+            android:hint="UNGGAH KE YOUTUBE"
             android:maxLines="2"
 
             android:onClick="uploadVideo"

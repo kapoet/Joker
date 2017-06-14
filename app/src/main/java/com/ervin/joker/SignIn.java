@@ -1,5 +1,6 @@
 package com.ervin.joker;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -33,6 +34,7 @@ public class SignIn extends AppCompatActivity {
     Button btnSignIn, btnSignUp;
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
+    ProgressDialog progressDialog;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,8 +44,10 @@ public class SignIn extends AppCompatActivity {
         btnSignIn = (Button) findViewById(R.id.btn_sign_in_masuk);
         btnSignUp = (Button)findViewById(R.id.btn_sign_in_mendaftar);
         mAuth = FirebaseAuth.getInstance();
+        progressDialog = new ProgressDialog(SignIn.this);
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         final DatabaseReference myRef = database.getReference();
+        myRef.keepSynced(true);
         if (getIntent().getExtras() != null && getIntent().getExtras().getBoolean("EXIT", false)) {
             finish();
         }
@@ -53,6 +57,8 @@ public class SignIn extends AppCompatActivity {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null) {
                     // User is signed in
+                    progressDialog.setMessage("Loading ...");
+                    progressDialog.show();
                     Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
                     myRef.child("User").child(user.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
@@ -64,9 +70,11 @@ public class SignIn extends AppCompatActivity {
                             if(jenis_Pengguna.equals("Personalia")){
                                 Intent intent = new Intent(SignIn.this,MainActivityPersonalia.class);
                                 startActivity(intent);
+                                progressDialog.dismiss();
                             } else if (jenis_Pengguna.equals("Pelamar_pekerjaan")){
                                 Intent intent = new Intent(SignIn.this,MainActivity.class);
                                 startActivity(intent);
+                                progressDialog.dismiss();
                             }
                         }
 

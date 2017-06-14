@@ -90,8 +90,8 @@ public class SignUpAsPersonalia extends AppCompatActivity {
                 final String deskripsi = edtDescription.getText().toString();
                 final String video = edtVideo.getText().toString();
                 if (email.isEmpty() || password.isEmpty() || nama.isEmpty() || gambar==false||deskripsi.isEmpty()||video.isEmpty()) {
-                    Toast.makeText(SignUpAsPersonalia.this, "Isikan semua field yang ada",
-                            Toast.LENGTH_SHORT).show();
+                    Toast.makeText(SignUpAsPersonalia.this, "Pastikan telah memilih photo profile dan mengisi semua field yang ada",
+                            Toast.LENGTH_LONG).show();
                     progressDialog.dismiss();
                 } else {
                     mAuth.createUserWithEmailAndPassword(email, password)

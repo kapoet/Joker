@@ -25,6 +25,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.nbsp.materialfilepicker.MaterialFilePicker;
@@ -125,8 +126,10 @@ public class UnggahDokumen extends AppCompatActivity {
                    // etDokumen.setText(filename);
                     Uri file = Uri.fromFile(new File(filePath));
                     StorageReference riversRef = mStorageRef.child("dokumen/"+user.getUid()+"/"+ filename);
-
-                    riversRef.putFile(file)
+                    StorageMetadata metadata = new StorageMetadata.Builder()
+                            .setContentType("application/pdf")
+                            .build();
+                    riversRef.putFile(file,metadata)
                             .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                                 @Override
                                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {

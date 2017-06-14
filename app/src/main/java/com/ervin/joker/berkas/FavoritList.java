@@ -50,6 +50,7 @@ public class FavoritList extends AppCompatActivity {
         final String userID = user.getUid();
         myRef = database.getReference().child("berkas");
         databaseUser = database.getReference();
+        Log.d(TAG, "Value haha5234: " + id_lowongan);
         mFirebaseAdapter = new FirebaseRecyclerAdapter<BerkasLamaran, BerkasLamaranAdapter>(BerkasLamaran.class, R.layout.layout_item_berkas_lamaran, BerkasLamaranAdapter.class,myRef.orderByChild("lowonganID_tanda").equalTo(id_lowongan+"_true")) {
             @Override
             protected void populateViewHolder(final BerkasLamaranAdapter viewHolder, final BerkasLamaran model, final int position) {

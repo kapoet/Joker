@@ -1,8 +1,12 @@
 package com.ervin.joker.berkas;
 
+import android.app.DownloadManager;
+import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
@@ -16,10 +20,13 @@ import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.bumptech.glide.Glide;
 import com.ervin.joker.R;
+import com.ervin.joker.dokumen.Dokumen;
+import com.ervin.joker.pengguna.SignUpAsPelamar;
 import com.google.android.youtube.player.YouTubeInitializationResult;
 import com.google.android.youtube.player.YouTubePlayer;
 import com.google.android.youtube.player.YouTubePlayerFragment;
@@ -28,6 +35,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.tonyodev.fetch.Fetch;
+import com.tonyodev.fetch.listener.FetchListener;
+import com.tonyodev.fetch.request.Request;
 
 
 import java.io.File;
@@ -48,7 +58,9 @@ public class DetailBerkas extends AppCompatActivity implements YouTubePlayer.OnI
     private YouTubePlayerFragment youTubeView;
     ToggleButton toggleButton;
     boolean standar;
-
+    String name;
+    DownloadManager mManager;
+    ProgressDialog progressDialog;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,6 +76,8 @@ public class DetailBerkas extends AppCompatActivity implements YouTubePlayer.OnI
         final boolean tanda = getIntent().getBooleanExtra("tanda",standar);
         final String berkasID = getIntent().getStringExtra("berkasID");
         final String lowongan_id = getIntent().getStringExtra("lowonganID");
+        String pelamarID = getIntent().getStringExtra("pelamarID");
+        progressDialog = new ProgressDialog(DetailBerkas.this);
         btnKirimEmail = (Button) findViewById(R.id.btn_detail_berkas_kirim_email);
         youTubeView = (YouTubePlayerFragment) getFragmentManager().findFragmentById(R.id.yv_detail_berkas_youtube_view);
         youTubeView.initialize(this.getResources().getString(R.string.google_api_key), this);
@@ -76,19 +90,46 @@ public class DetailBerkas extends AppCompatActivity implements YouTubePlayer.OnI
         tvEmail.setText(email);
         toggleButton = (ToggleButton) findViewById(R.id.myToggleButton);
         toggleButton.setChecked(tanda);
-        toggleButton.setBackgroundDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.star));
+        myRef.child("Dokumen").child(pelamarID).orderByChild("link_dokumen").equalTo(dokumen).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // This method is called once with the initial value and again
+                // whenever data at this location is updated.
+                for (DataSnapshot childSnapshot: dataSnapshot.getChildren()) {
+
+                    Dokumen pelamar = childSnapshot.getValue(Dokumen.class);
+                    String nama_file = pelamar.getNama_dokumen();
+                    Log.d("aaa", "Value nama file: " + nama_file);
+                    name = nama_file;
+
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                // Failed to read value
+
+            }
+        });
+
+
+        if(tanda==false){
+            toggleButton.setBackgroundDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.star));
+        } else {
+            toggleButton.setBackgroundDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.star_filled));
+        }
         toggleButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked) {
-                    toggleButton.setBackgroundDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.star));
+                    toggleButton.setBackgroundDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.star_filled));
                     myRef.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
                             // This method is called once with the initial value and again
                             // whenever data at this location is updated.
                             myRef.child("berkas").child(berkasID).child("tanda").setValue(true);
-                            myRef.child("berkas").child(berkasID).child("lowonoganID_tanda").setValue(lowongan_id+"_"+true);
+                            myRef.child("berkas").child(berkasID).child("lowonganID_tanda").setValue(lowongan_id+"_"+true);
                         }
 
                         @Override
@@ -98,7 +139,7 @@ public class DetailBerkas extends AppCompatActivity implements YouTubePlayer.OnI
                         }
                     });
                 } else {
-                    toggleButton.setBackgroundDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.star_black));
+                    toggleButton.setBackgroundDrawable(ContextCompat.getDrawable(getApplicationContext(), R.drawable.star));
                     myRef.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
@@ -121,16 +162,62 @@ public class DetailBerkas extends AppCompatActivity implements YouTubePlayer.OnI
         tvDokumen.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(Intent.ACTION_VIEW);
-                intent.setDataAndType(Uri.parse(dokumen), "application/pdf");
-                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                Intent newIntent = Intent.createChooser(intent, "Open File");
-                try {
-                    startActivity(newIntent);
-                } catch (ActivityNotFoundException e) {
-                    // Instruct the user to install a PDF reader here, or something
-                }
+//                Intent intent = new Intent(Intent.ACTION_VIEW);
+//                intent.setDataAndType(Uri.parse(dokumen), "application/pdf");
+//                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//                Intent newIntent = Intent.createChooser(intent, "Open File");
+//                try {
+//                    startActivity(newIntent);
+//                } catch (ActivityNotFoundException e) {
+//                    // Instruct the user to install a PDF reader here, or something
+//                }
+//
+//                Fetch fetch = Fetch.getInstance(DetailBerkas.this);
+//                String path = String.valueOf(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS));
+//                Request request = new Request(dokumen,path,"dokumencval.pdf");
+//                final long downloadId = fetch.enqueue(request);
+//
+//                fetch.addFetchListener(new FetchListener() {
+//
+//                    @Override
+//                    public void onUpdate(long id, int status, int progress, long downloadedBytes, long fileSize, int error) {
+//                        Log.d("sss", "createUserWithEmail:onComplete:" + progress);
+//                        if(progress==100){
+//                            File file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+//                                    +"dokumencval.pdf");//
+//                            Intent intent = new Intent(Intent.ACTION_VIEW);
+//                intent.setDataAndType(Uri.fromFile(file), "application/pdf");
+//                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//                Intent newIntent = Intent.createChooser(intent, "Open File");
+//                try {
+//                    startActivity(newIntent);
+//                } catch (ActivityNotFoundException e) {
+//                    // Instruct the user to install a PDF reader here, or something
+//                }
+//                        }
+//                        if(downloadId == id && status == Fetch.STATUS_DOWNLOADING) {
+//                            Log.d("sss", "createUserWithEmail:onComplete:" + progress);
+//                            if(progress==100){
+//                                Toast.makeText(DetailBerkas.this, "Isikan semua field yang ada",
+//                                        Toast.LENGTH_SHORT).show();
+//                            }
+//
+//                        }else if(error != Fetch.NO_ERROR) {
+//                            //An error occurred
+//                            Log.d("sss", "createUserWithEmail:onComplete:" + progress);
+//                            if(error == Fetch.ERROR_HTTP_NOT_FOUND) {
+//                                //handle error
+//                                Log.d("sss", "createUserWithEmail:onComplete:" + progress);
+//                            }
+//
+//                        }
+//                    }
+//                });
+//                Intent i = new Intent(Intent.ACTION_VIEW);
+//                i.setData(Uri.parse(dokumen));
+//                startActivity(i);
 
+                down(dokumen,name);
             }
         });
 
@@ -166,4 +253,49 @@ public class DetailBerkas extends AppCompatActivity implements YouTubePlayer.OnI
         finish();
         return true;
     }
+
+    public void down(String dokumen, String namaFile) {
+        Toast.makeText(this, "Mengunduh dimulai...", Toast.LENGTH_LONG).show();
+        mManager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
+        Uri downloadUri = Uri.parse(dokumen);
+        DownloadManager.Request request = new DownloadManager.Request(
+                downloadUri)
+                .setTitle("Mengunduh")
+                .setDestinationInExternalPublicDir(
+                        Environment.DIRECTORY_DOWNLOADS, namaFile)
+                .setDescription("Unduhan dalam proses").setMimeType("pdf");
+        long a = mManager.enqueue(request);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        IntentFilter intentFilter = new IntentFilter(
+                DownloadManager.ACTION_DOWNLOAD_COMPLETE);
+        registerReceiver(broadcast, intentFilter);
+    }
+    public void showPdf() {
+
+        try {
+            File file = new File(Environment.getExternalStorageDirectory()
+                    + "/Download/" + name );//name here is the name of any string you want to pass to the method
+            if (!file.isDirectory())
+                file.mkdir();
+            Intent testIntent = new Intent("com.adobe.reader");
+            testIntent.setType("application/pdf");
+            testIntent.setAction(Intent.ACTION_VIEW);
+            Uri uri = Uri.fromFile(file);
+            testIntent.setDataAndType(uri, "application/pdf");
+            startActivity(testIntent);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    BroadcastReceiver broadcast = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            showPdf();
+        }
+    };
 }
