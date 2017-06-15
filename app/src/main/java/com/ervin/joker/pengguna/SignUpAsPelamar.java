@@ -86,53 +86,65 @@ public class SignUpAsPelamar extends AppCompatActivity {
                 String password = edtPassword.getText().toString();
                 final String deskripsi = "khkh";
                 final String video = "gkgkgkgkgkg";
+                String emailPattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+";
+
+// onClick of button perform this simplest code.
+
                 if (email.isEmpty() || password.isEmpty() || nama.isEmpty() || gambar==false) {
                     Toast.makeText(SignUpAsPelamar.this, "Pastikan telah memilih photo profile dan mengisi semua field yang ada",
                             Toast.LENGTH_SHORT).show();
                     progressDialog.dismiss();
                 } else {
-                    mAuth.createUserWithEmailAndPassword(email, password)
-                            .addOnCompleteListener(SignUpAsPelamar.this, new OnCompleteListener<AuthResult>() {
-                                @Override
-                                public void onComplete(@NonNull Task<AuthResult> task) {
-                                    Log.d(TAG, "createUserWithEmail:onComplete:" + task.isSuccessful());
-                                    if (!task.isSuccessful()) {
-                                        progressDialog.dismiss();
-                                        Toast.makeText(SignUpAsPelamar.this, "Akun tersebut telah terdaftar",
-                                                Toast.LENGTH_SHORT).show();
-                                    } else {
-                                        //Uri file = Uri.fromFile(new File(pathImage));
-                                        //String filename=pathImage.substring(pathImage.lastIndexOf("/")+1);
-                                        final FirebaseUser user = mAuth.getCurrentUser();
-                                        StorageReference riversRef = mStorageRef.child("images/" + user.getUid() + "/" + "phto_profile.jpg");
-                                        riversRef.putFile(rawPathImage)
-                                                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                                                    @Override
-                                                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                                        // Get a URL to the uploaded content
-                                                        @SuppressWarnings("VisibleForTests")
-                                                        Uri downloadUrl = taskSnapshot.getDownloadUrl();
-                                                        linkPhoto = String.valueOf(downloadUrl);
-                                                        User pelamar = new User(nama, linkPhoto, jenis_pengguna);
-                                                        myRef.child("User").child(user.getUid()).setValue(pelamar);
-                                                        progressDialog.dismiss();
-                                                    }
-                                                })
-                                                .addOnFailureListener(new OnFailureListener() {
-                                                    @Override
-                                                    public void onFailure(@NonNull Exception exception) {
-                                                        mAuth.signOut();
-                                                        progressDialog.dismiss();
-                                                        // Handle unsuccessful uploads
-                                                        // ...
-                                                    }
-                                                });
+                    if (email.matches(emailPattern)||password.length()>7)
+                    {
+                        mAuth.createUserWithEmailAndPassword(email, password)
+                                .addOnCompleteListener(SignUpAsPelamar.this, new OnCompleteListener<AuthResult>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<AuthResult> task) {
+                                        Log.d(TAG, "createUserWithEmail:onComplete:" + task.isSuccessful());
+                                        if (!task.isSuccessful()) {
+                                            progressDialog.dismiss();
+                                            Toast.makeText(SignUpAsPelamar.this, "Akun tersebut telah terdaftar",
+                                                    Toast.LENGTH_SHORT).show();
+                                        } else {
+                                            //Uri file = Uri.fromFile(new File(pathImage));
+                                            //String filename=pathImage.substring(pathImage.lastIndexOf("/")+1);
+                                            final FirebaseUser user = mAuth.getCurrentUser();
+                                            StorageReference riversRef = mStorageRef.child("images/" + user.getUid() + "/" + "phto_profile.jpg");
+                                            riversRef.putFile(rawPathImage)
+                                                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                                        @Override
+                                                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                                            // Get a URL to the uploaded content
+                                                            @SuppressWarnings("VisibleForTests")
+                                                            Uri downloadUrl = taskSnapshot.getDownloadUrl();
+                                                            linkPhoto = String.valueOf(downloadUrl);
+                                                            User pelamar = new User(nama, linkPhoto, jenis_pengguna);
+                                                            myRef.child("User").child(user.getUid()).setValue(pelamar);
+                                                            progressDialog.dismiss();
+                                                        }
+                                                    })
+                                                    .addOnFailureListener(new OnFailureListener() {
+                                                        @Override
+                                                        public void onFailure(@NonNull Exception exception) {
+                                                            mAuth.signOut();
+                                                            progressDialog.dismiss();
+                                                            // Handle unsuccessful uploads
+                                                            // ...
+                                                        }
+                                                    });
 
+                                        }
+
+                                        // ...
                                     }
+                                });
+                    }
+                    else
+                    {
+                        Toast.makeText(getApplicationContext(),"Email/sandi yang dimasukkan salah", Toast.LENGTH_SHORT).show();
+                    }
 
-                                    // ...
-                                }
-                            });
                 }
             }
         });

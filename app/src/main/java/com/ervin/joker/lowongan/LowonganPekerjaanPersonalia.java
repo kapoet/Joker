@@ -15,6 +15,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.ervin.joker.R;
 import com.ervin.joker.pengguna.User;
@@ -61,8 +62,10 @@ public class LowonganPekerjaanPersonalia extends Fragment {
         final String userID = user.getUid();
         myRef = database.getReference().child("Lowongan_pekerjaan");
         databaseUser = database.getReference();
+        final TextView a = (TextView) vw.findViewById(R.id.textPeringatan);
         myRef.keepSynced(true);
         databaseUser.keepSynced(true);
+
         mFirebaseAdapter = new FirebaseRecyclerAdapter<LowonganPekerjaan, LowonganPekerjaanAdapter>(LowonganPekerjaan.class, R.layout.layout_item_pekerjaan, LowonganPekerjaanAdapter.class,myRef.orderByChild("pembuat_lowongan").equalTo(user.getUid())) {
             @Override
             protected void populateViewHolder(final LowonganPekerjaanAdapter viewHolder, final LowonganPekerjaan model, final int position) {
@@ -74,6 +77,15 @@ public class LowonganPekerjaanPersonalia extends Fragment {
                 viewHolder.setBatasPengiriman(day);
                 viewHolder.setLowongan(model.getPosisi_lowong());
                 viewHolder.setDeskripsiPerusahaan(model.getDeskripsi());
+                String c = model.getPosisi_lowong();
+                Log.d(TAG, "Value is: " + c);
+                if (c.isEmpty()){
+                    a.setVisibility(View.VISIBLE);
+                    rv.setVisibility(View.INVISIBLE);
+                } else {
+                    rv.setVisibility(View.VISIBLE);
+                    a.setVisibility(View.INVISIBLE);
+                }
                 // databaseUser.child(model.getPembuat_lowongan());
                 databaseUser.child("User").child(model.getPembuat_lowongan()).addValueEventListener(new ValueEventListener() {
                     // myRef.addValueEventListener(new ValueEventListener() {
@@ -216,6 +228,12 @@ public class LowonganPekerjaanPersonalia extends Fragment {
                     }
 
                 });
+            }
+
+            @Override
+            protected void onDataChanged() {
+                super.onDataChanged();
+               a.setVisibility(getItemCount() == 0 ? View.VISIBLE : View.GONE);
             }
         };
 

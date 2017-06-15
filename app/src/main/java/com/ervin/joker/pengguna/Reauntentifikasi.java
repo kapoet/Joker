@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.ervin.joker.R;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -41,30 +42,32 @@ public class Reauntentifikasi extends AppCompatActivity {
                 progressDialog.show();
                 FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
-// Get auth credentials from the user for re-authentication. The example below shows
-// email and password credentials but there are multiple possible providers,
-// such as GoogleAuthProvider or FacebookAuthProvider.
                 AuthCredential credential = EmailAuthProvider
                         .getCredential(email.getText().toString(), password.getText().toString());
 
-// Prompt the user to re-provide their sign-in credentials
                 user.reauthenticate(credential)
                         .addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
-                                progressDialog.dismiss();
-                                String jenis = getIntent().getStringExtra("jenis");
-                                if(jenis.equals("Pelamar_pekerjaan")){
-                                    Intent intent = new Intent(Reauntentifikasi.this, EditProfilePelamar.class);
-                                    startActivity(intent);
-                                    finish();
-                                } else {
-                                    Intent intent = new Intent(Reauntentifikasi.this, EditProfilePersonalia.class);
-                                    startActivity(intent);
-                                    finish();
-                                }
+                                if (task.isSuccessful()) {
+                                    progressDialog.dismiss();
+                                    String jenis = getIntent().getStringExtra("jenis");
+                                    if (jenis.equals("Pelamar_pekerjaan")) {
+                                        Intent intent = new Intent(Reauntentifikasi.this, EditProfilePelamar.class);
+                                        startActivity(intent);
+                                        finish();
+                                    } else {
+                                        Intent intent = new Intent(Reauntentifikasi.this, EditProfilePersonalia.class);
+                                        startActivity(intent);
+                                        finish();
+                                    }
 
+                                } else {
+                                    progressDialog.dismiss();
+                                    Toast.makeText(Reauntentifikasi.this,"Email/Sandi yang dimasukkan salah", Toast.LENGTH_SHORT).show();
+                                }
                             }
+
                         });
             }
         });

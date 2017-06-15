@@ -45,6 +45,7 @@ public class SignIn extends AppCompatActivity {
         btnSignUp = (Button)findViewById(R.id.btn_sign_in_mendaftar);
         mAuth = FirebaseAuth.getInstance();
         progressDialog = new ProgressDialog(SignIn.this);
+        progressDialog.setMessage("Loading ...");
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         final DatabaseReference myRef = database.getReference();
         myRef.keepSynced(true);
@@ -57,7 +58,6 @@ public class SignIn extends AppCompatActivity {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null) {
                     // User is signed in
-                    progressDialog.setMessage("Loading ...");
                     progressDialog.show();
                     Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
                     myRef.child("User").child(user.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -102,6 +102,7 @@ public class SignIn extends AppCompatActivity {
                 if(email.isEmpty()||password.isEmpty()){
                     Toast.makeText(SignIn.this,"Silahkan isi semua field yang ada", Toast.LENGTH_SHORT).show();
                 } else {
+                    progressDialog.show();
                     mAuth.signInWithEmailAndPassword(email, password)
                             .addOnCompleteListener(SignIn.this, new OnCompleteListener<AuthResult>() {
                                 @Override
@@ -112,6 +113,7 @@ public class SignIn extends AppCompatActivity {
                                     // the auth state listener will be notified and logic to handle the
                                     // signed in user can be handled in the listener.
                                     if (!task.isSuccessful()) {
+                                        progressDialog.dismiss();
                                         String a = "Email/Password yang anda masukkan salah";
                                         Toast.makeText(SignIn.this,a,
                                                 Toast.LENGTH_SHORT).show();

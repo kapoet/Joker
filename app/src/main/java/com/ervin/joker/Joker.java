@@ -14,4 +14,5 @@ public class Joker extends Application{
         super.onCreate();
         FirebaseDatabase.getInstance().setPersistenceEnabled(true);
     }
+
 }

@@ -41,9 +41,6 @@ import com.tonyodev.fetch.request.Request;
 
 
 import java.io.File;
-import java.util.ArrayList;
-
-import pl.polidea.view.ZoomView;
 
 
 /**

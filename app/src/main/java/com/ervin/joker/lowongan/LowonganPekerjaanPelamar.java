@@ -11,6 +11,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.TextView;
 
 import com.ervin.joker.R;
 import com.ervin.joker.pengguna.User;
@@ -54,6 +56,7 @@ public class LowonganPekerjaanPelamar extends Fragment {
         final String userID = user.getUid();
         myRef = database.getReference().child("Lowongan_pekerjaan");
         databaseUser = database.getReference();
+        final TextView a= (TextView) vw.findViewById(R.id.textPeringatan);
         Calendar date = Calendar.getInstance();
         long hariIni = date.getTimeInMillis();
         myRef.keepSynced(true);
@@ -83,7 +86,9 @@ public class LowonganPekerjaanPelamar extends Fragment {
                         // String value = dataSnapshot.getValue(String.class);
                         User personalia = dataSnapshot.getValue(User.class);
                         String sgetNama =personalia.getNama();
+
                         String sgetGambar =personalia.getPhoto_profil();
+
                         viewHolder.setNamaPerusahaan(sgetNama);
                         viewHolder.setLink_gambar(sgetGambar);
                         //Log.d(TAG, "Value is: " + aa);
@@ -169,6 +174,8 @@ public class LowonganPekerjaanPelamar extends Fragment {
         };
 
         rv.setAdapter(mFirebaseAdapter);
+
+        Log.d(TAG, "tanggal hari ini: " + mFirebaseAdapter.getItemCount());
 
         return vw;
     }

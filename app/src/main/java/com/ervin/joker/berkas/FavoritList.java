@@ -111,6 +111,7 @@ public class FavoritList extends AppCompatActivity {
                                 link_video = model.getLink_video();
                                 link_dokumen = model.getLink_dokumen();
                                 boolean tanda = model.isTanda();
+                                String idPelamar = model.getId_pelamar();
                                 Intent intent = new Intent(FavoritList.this, DetailBerkas.class);
                                 intent.putExtra("nama_perusahaan",getNama);
                                 intent.putExtra("gambar_perusahaan",getGambar);
@@ -120,6 +121,7 @@ public class FavoritList extends AppCompatActivity {
                                 intent.putExtra("tanda", tanda);
                                 intent.putExtra("berkasID",abu);
                                 intent.putExtra("lowonganID",id_lowongan);
+                                intent.putExtra("pelamarID",idPelamar);
                                 startActivity(intent);
                             }
                             @Override
