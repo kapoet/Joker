@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -31,13 +32,14 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.nguyenhoanglam.imagepicker.activity.ImagePicker;
+import com.nguyenhoanglam.imagepicker.activity.ImagePickerActivity;
+import com.nguyenhoanglam.imagepicker.model.Image;
 
 import java.io.File;
 import java.util.ArrayList;
 
-import in.myinnos.awesomeimagepicker.activities.AlbumSelectActivity;
-import in.myinnos.awesomeimagepicker.helpers.ConstantsCustomGallery;
-import in.myinnos.awesomeimagepicker.models.Image;
+
 
 /**
  * Created by ervin on 6/8/2017.
@@ -80,7 +82,7 @@ public class EditProfilePelamar extends AppCompatActivity {
                     rawPathImage= Uri.parse(sgetGambar);
                     gambar=true;
                 }
-                Glide.with(EditProfilePelamar.this).load(sgetGambar).placeholder(R.drawable.user).dontAnimate().into(ivPhoto_profile);
+                Glide.with(EditProfilePelamar.this).load(sgetGambar).placeholder(R.drawable.ic_menu_gallery).dontAnimate().into(ivPhoto_profile);
             }
 
             @Override
@@ -93,9 +95,12 @@ public class EditProfilePelamar extends AppCompatActivity {
         ivPhoto_profile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(EditProfilePelamar.this, AlbumSelectActivity.class);
-                intent.putExtra(ConstantsCustomGallery.INTENT_EXTRA_LIMIT, 1); // set limit for image selection
-                startActivityForResult(intent, ConstantsCustomGallery.REQUEST_CODE);
+                ImagePicker.create(EditProfilePelamar.this)
+                        .folderMode(false) // folder mode (false by default)
+                        .single() // single mode
+                        .limit(1) // max images can be selected (999 by default)
+                        .showCamera(true) // show camera or not (true by default)
+                        .start(5);
             }
         });
         btnEdit.setOnClickListener(new View.OnClickListener() {
@@ -111,79 +116,86 @@ public class EditProfilePelamar extends AppCompatActivity {
                             Toast.LENGTH_SHORT).show();
                     progressDialog.dismiss();
                 } else {
-                    user.updateEmail(etEmail.getText().toString())
-                            .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                @Override
-                                public void onComplete(@NonNull Task<Void> task) {
-                                    if (task.isSuccessful()) {
-                                        Log.d("aaa", "User email address updated.");
-                                        myRef.child("berkas").orderByChild("id_pelamar").equalTo(user.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
-                                            @Override
-                                            public void onDataChange(DataSnapshot dataSnapshot) {
-                                                // This method is called once with the initial value and again
-                                                // whenever data at this location is updated.
-                                                for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                                                    snapshot.getRef().child("email_pelamar").setValue(user.getEmail());
+                    if(isValidEmail(email)&&Password.length()>7){
+                        user.updateEmail(etEmail.getText().toString())
+                                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        if (task.isSuccessful()) {
+                                            Log.d("aaa", "User email address updated.");
+                                            myRef.child("berkas").orderByChild("id_pelamar").equalTo(user.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+                                                @Override
+                                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                                    // This method is called once with the initial value and again
+                                                    // whenever data at this location is updated.
+                                                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                                                        snapshot.getRef().child("email_pelamar").setValue(user.getEmail());
+                                                    }
                                                 }
-                                            }
 
+                                                @Override
+                                                public void onCancelled(DatabaseError error) {
+                                                    // Failed to read value
+
+                                                }
+                                            });
+                                        }
+                                    }
+                                });
+
+                        user.updatePassword(etPassword.getText().toString())
+                                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        if (task.isSuccessful()) {
+                                            Log.d("aaa", "User password updated.");
+                                        }
+                                    }
+                                });
+                        myRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                StorageReference mStorageRef;
+                                mStorageRef = FirebaseStorage.getInstance().getReference();
+                                Uri file = rawPathImage;
+                                StorageReference riversRef = mStorageRef.child("images/" + user.getUid() + "/" + "photo_profile.jpg");
+
+                                riversRef.putFile(file)
+                                        .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                                             @Override
-                                            public void onCancelled(DatabaseError error) {
-                                                // Failed to read value
-
+                                            public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                                // Get a URL to the uploaded content
+                                                @SuppressWarnings("VisibleForTests")
+                                                Uri downloadUrl = taskSnapshot.getDownloadUrl();
+                                                User pengguna = new User(etNama.getText().toString(), String.valueOf(downloadUrl), jenis_pengguna);
+                                                myRef.child("User").child(user.getUid()).setValue(pengguna);
+                                            }
+                                        })
+                                        .addOnFailureListener(new OnFailureListener() {
+                                            @Override
+                                            public void onFailure(@NonNull Exception exception) {
+                                                // Handle unsuccessful uploads
+                                                // ...
                                             }
                                         });
-                                    }
-                                }
-                            });
 
-                    user.updatePassword(etPassword.getText().toString())
-                            .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                @Override
-                                public void onComplete(@NonNull Task<Void> task) {
-                                    if (task.isSuccessful()) {
-                                        Log.d("aaa", "User password updated.");
-                                    }
-                                }
-                            });
-                    myRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            StorageReference mStorageRef;
-                            mStorageRef = FirebaseStorage.getInstance().getReference();
-                            Uri file = rawPathImage;
-                            StorageReference riversRef = mStorageRef.child("images/" + user.getUid() + "/" + "photo_profile.jpg");
+                            }
 
-                            riversRef.putFile(file)
-                                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                                        @Override
-                                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                            // Get a URL to the uploaded content
-                                            @SuppressWarnings("VisibleForTests")
-                                            Uri downloadUrl = taskSnapshot.getDownloadUrl();
-                                            User pengguna = new User(etNama.getText().toString(), String.valueOf(downloadUrl), jenis_pengguna);
-                                            myRef.child("User").child(user.getUid()).setValue(pengguna);
-                                        }
-                                    })
-                                    .addOnFailureListener(new OnFailureListener() {
-                                        @Override
-                                        public void onFailure(@NonNull Exception exception) {
-                                            // Handle unsuccessful uploads
-                                            // ...
-                                        }
-                                    });
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
 
-                        }
-
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-
-                        }
-                    });
-                    progressDialog.dismiss();
-                    Intent intent = new Intent(EditProfilePelamar.this,MainActivity.class);
-                    startActivity(intent);
-                    finish();
+                            }
+                        });
+                        progressDialog.dismiss();
+                        Intent intent = new Intent(EditProfilePelamar.this,MainActivity.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                    else {
+                        progressDialog.dismiss();
+                        Toast.makeText(EditProfilePelamar.this, "Pastikan email dan password anda benar",
+                                Toast.LENGTH_SHORT).show();
+                    }
                 }
             }
         });
@@ -191,18 +203,21 @@ public class EditProfilePelamar extends AppCompatActivity {
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == ConstantsCustomGallery.REQUEST_CODE && resultCode == Activity.RESULT_OK && data != null) {
-            //The array list has the image paths of the selected images
-            ArrayList<Image> images = data.getParcelableArrayListExtra(ConstantsCustomGallery.INTENT_EXTRA_IMAGES);
-
-            for (int i = 0; i < images.size(); i++) {
-                Uri uri = Uri.fromFile(new File(images.get(i).path));
-                // start play with image uri
-                rawPathImage= uri;
-                gambar=true;
-            }
+        if (requestCode == 5 && resultCode == RESULT_OK && data != null) {
+            ArrayList<Image> images = data.getParcelableArrayListExtra(ImagePickerActivity.INTENT_EXTRA_SELECTED_IMAGES);
+            Uri uri = Uri.fromFile(new File(images.get(0).getPath()));
+            rawPathImage= uri;
             Glide.with(EditProfilePelamar.this).load(rawPathImage).dontAnimate().into(ivPhoto_profile);
+            gambar=true;
+        }
+
+    }
+
+    public final static boolean isValidEmail(CharSequence target) {
+        if (TextUtils.isEmpty(target)) {
+            return false;
+        } else {
+            return android.util.Patterns.EMAIL_ADDRESS.matcher(target).matches();
         }
     }
 }

@@ -1,6 +1,7 @@
 package com.ervin.joker.lowongan;
 
 import android.app.DatePickerDialog;
+import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -12,8 +13,11 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.ervin.joker.MainActivity;
+import com.ervin.joker.MainActivityPersonalia;
 import com.ervin.joker.R;
 import com.ervin.joker.lowongan.LowonganPekerjaan;
+import com.ervin.joker.pengguna.EditProfilePersonalia;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
@@ -44,6 +48,7 @@ public class TambahLowongan extends Fragment {
         etDeskripsi = (EditText) vw.findViewById(R.id.et_tambah_lowongan_deskripsi);
         etPosisiLowong = (EditText) vw.findViewById(R.id.et_tambah_lowongan_posisi_lowong);
         etTanggal = (EditText) vw.findViewById(R.id.et_tambah_lowongan_date_picker);
+        etTanggal.setKeyListener(null);
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         final DatabaseReference myRef = database.getReference();
         btnPilihTanggal.setOnClickListener(new View.OnClickListener() {
@@ -86,13 +91,22 @@ public class TambahLowongan extends Fragment {
                 String deskripsi = etDeskripsi.getText().toString();
                 String posisi = etPosisiLowong.getText().toString();
                 FirebaseUser user = mAuth.getCurrentUser();
-                LowonganPekerjaan lowongan = new LowonganPekerjaan(posisi,user.getUid(),deskripsi,timeInMillis,timeMilisSekarang);
-                myRef.child("Lowongan_pekerjaan").push().setValue(lowongan);
-                etTanggal.getText().clear();
-                etPosisiLowong.getText().clear();
-                etDeskripsi.getText().clear();
-                Toast.makeText(getActivity(), "Lowongan berhasil ditambahkan",
-                        Toast.LENGTH_SHORT).show();
+                if(timeInMillis<timeMilisSekarang){
+                    Toast.makeText(getActivity(), "Periksa tanggal anda",
+                            Toast.LENGTH_SHORT).show();
+                } else {
+                    LowonganPekerjaan lowongan = new LowonganPekerjaan(posisi,user.getUid(),deskripsi,timeInMillis,timeMilisSekarang);
+                    myRef.child("Lowongan_pekerjaan").push().setValue(lowongan);
+                    etTanggal.getText().clear();
+                    etPosisiLowong.getText().clear();
+                    etDeskripsi.getText().clear();
+                    Intent intent = new Intent(getActivity(),MainActivityPersonalia.class);
+                    startActivity(intent);
+                    getActivity().finish();
+                    Toast.makeText(getActivity(), "Lowongan berhasil ditambahkan",
+                            Toast.LENGTH_SHORT).show();
+                }
+
             }
         });
 

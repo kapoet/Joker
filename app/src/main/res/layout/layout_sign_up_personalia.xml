@@ -230,7 +230,7 @@
                     android:layout_weight="1"
                     android:background="#995381c1"
                     android:ems="10"
-                    android:hint="Video ID"
+                    android:hint="Video tentang perusahaan"
                     android:inputType="none"
                     android:padding="16dp"
                     android:textColor="#fff"

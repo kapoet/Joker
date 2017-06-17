@@ -65,7 +65,7 @@
                         android:layout_weight="1"
                         android:ems="10"
                         android:hint="dd-mm-yyyy"
-                        android:inputType="textPersonName" />
+                        android:inputType="date" />
 
                     <Button
                         android:id="@+id/btn_select_date"

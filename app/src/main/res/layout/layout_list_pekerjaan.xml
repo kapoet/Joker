@@ -6,21 +6,41 @@
     android:gravity="center_horizontal"
     android:orientation="vertical">
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recycleViewGamabar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@+id/btn_coba"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="5dp"
+            android:layout_marginTop="5dp"
+            android:paddingBottom="5dp" />
+
+        <Button
+            android:id="@+id/btn_coba"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_gravity="bottom|center_horizontal"
+            android:layout_marginBottom="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:background="#e12e6b"
+            android:text="Load more"
+            android:textColor="@color/cardview_light_background" />
+
+    </RelativeLayout>
+
     <TextView
         android:id="@+id/textPeringatan"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:text="Anda belum menambahkan lowongan pekerjaan"
-         />
+        android:visibility="invisible" />
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/recycleViewGamabar"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="5dp"
-        android:layout_marginTop="5dp"
-        android:paddingBottom="5dp"
-        />
 </FrameLayout>

@@ -4,12 +4,15 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -31,13 +34,13 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.nguyenhoanglam.imagepicker.activity.ImagePicker;
+import com.nguyenhoanglam.imagepicker.activity.ImagePickerActivity;
+import com.nguyenhoanglam.imagepicker.model.Image;
 
 import java.io.File;
 import java.util.ArrayList;
 
-import in.myinnos.awesomeimagepicker.activities.AlbumSelectActivity;
-import in.myinnos.awesomeimagepicker.helpers.ConstantsCustomGallery;
-import in.myinnos.awesomeimagepicker.models.Image;
 
 /**
  * Created by ervin on 5/30/2017.
@@ -55,11 +58,12 @@ public class SignUpAsPelamar extends AppCompatActivity {
     ProgressDialog progressDialog;
     private StorageReference mStorageRef;
     DatabaseReference myRef;
-    private static final int PICK_IMAGE = ConstantsCustomGallery.REQUEST_CODE;
+    private static final int PICK_IMAGE = 8;
     private static final int GET_DATA = 7;
     private FirebaseAuth.AuthStateListener mAuthListener;
     String jenis_pengguna = "Pelamar_pekerjaan";
     boolean gambar = false;
+    private ArrayList<Image> images = new ArrayList<>();
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -95,7 +99,8 @@ public class SignUpAsPelamar extends AppCompatActivity {
                             Toast.LENGTH_SHORT).show();
                     progressDialog.dismiss();
                 } else {
-                    if (email.matches(emailPattern)||password.length()>7)
+                    Log.d(TAG, "createUserWithEmail:onComplete:"+password.length());
+                    if (isValidEmail(email)&&password.length()>7)
                     {
                         mAuth.createUserWithEmailAndPassword(email, password)
                                 .addOnCompleteListener(SignUpAsPelamar.this, new OnCompleteListener<AuthResult>() {
@@ -142,6 +147,7 @@ public class SignUpAsPelamar extends AppCompatActivity {
                     }
                     else
                     {
+                        progressDialog.dismiss();
                         Toast.makeText(getApplicationContext(),"Email/sandi yang dimasukkan salah", Toast.LENGTH_SHORT).show();
                     }
 
@@ -153,9 +159,13 @@ public class SignUpAsPelamar extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 checkFilePermissions();
-                Intent intent = new Intent(SignUpAsPelamar.this, AlbumSelectActivity.class);
-                intent.putExtra(ConstantsCustomGallery.INTENT_EXTRA_LIMIT, 1); // set limit for image selection
-                startActivityForResult(intent, ConstantsCustomGallery.REQUEST_CODE);
+                ImagePicker.create(SignUpAsPelamar.this)
+                        .folderMode(false) // folder mode (false by default)
+                        .single() // single mode
+                        .limit(1) // max images can be selected (999 by default)
+                        .showCamera(true) // show camera or not (true by default)
+                        .start(PICK_IMAGE);
+
             }
         });
 
@@ -185,15 +195,9 @@ public class SignUpAsPelamar extends AppCompatActivity {
         switch (requestCode){
             case PICK_IMAGE:
                 if(resultCode == Activity.RESULT_OK && data != null){
-                    ArrayList<Image> images = data.getParcelableArrayListExtra(ConstantsCustomGallery.INTENT_EXTRA_IMAGES);
-
-                    for (int i = 0; i < images.size(); i++) {
-                        Uri uri = Uri.fromFile(new File(images.get(i).path));
-                        // start play with image uri
-                        rawPathImage= uri;
-                    }
-                    // pathImage = rawPathImage.replaceAll("file://","");// untuk menghilangkan "file//" pada path gambar
-
+                    ArrayList<Image> images = data.getParcelableArrayListExtra(ImagePickerActivity.INTENT_EXTRA_SELECTED_IMAGES);
+                    Uri uri = Uri.fromFile(new File(images.get(0).getPath()));
+                    rawPathImage= uri;
                     Glide.with(this).load(rawPathImage).into(ivGambarProfile);
                     gambar=true;
                 }
@@ -238,6 +242,14 @@ public class SignUpAsPelamar extends AppCompatActivity {
         super.onStop();
         if (mAuthListener != null) {
             mAuth.removeAuthStateListener(mAuthListener);
+        }
+    }
+
+    public final static boolean isValidEmail(CharSequence target) {
+        if (TextUtils.isEmpty(target)) {
+            return false;
+        } else {
+            return android.util.Patterns.EMAIL_ADDRESS.matcher(target).matches();
         }
     }
 }

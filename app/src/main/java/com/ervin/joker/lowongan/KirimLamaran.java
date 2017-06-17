@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.ervin.joker.R;
 import com.ervin.joker.dokumen.UnggahDokumen;
@@ -50,6 +51,8 @@ public class KirimLamaran extends AppCompatActivity {
         ivVideo = (ImageView) findViewById(R.id.iv_kirim_berkas_lamaran_video);
         mAuth = FirebaseAuth.getInstance();
         mStorageRef = FirebaseStorage.getInstance().getReference();
+        etDokumen.setKeyListener(null);
+        etVideo.setKeyListener(null);
         final FirebaseUser user = mAuth.getCurrentUser();
         final String userID = user.getUid();
         final String aa= user.getEmail();
@@ -82,10 +85,16 @@ public class KirimLamaran extends AppCompatActivity {
                 final String id_lowongan = getIntent().getStringExtra("lowongan_id");
                 final boolean tanda = false;
                 final String lowonganId_false = id_lowongan+"_"+tanda;
-                BerkasLamaran berkas = new BerkasLamaran(link_video,aa,id_lowongan,link,userID,tanda,lowonganId_false);
-                myRef.child("berkas").child(id_lowongan+"_"+userID).setValue(berkas);
-                setResult(RESULT_OK);
-                finish();
+                if(link_video.isEmpty()||id_lowongan.isEmpty()){
+                    Toast.makeText(KirimLamaran.this, "Pastikan telah memilih video/dokumen",
+                            Toast.LENGTH_SHORT).show();
+                } else {
+                    BerkasLamaran berkas = new BerkasLamaran(link_video,aa,id_lowongan,link,userID,tanda,lowonganId_false);
+                    myRef.child("berkas").child(id_lowongan+"_"+userID).setValue(berkas);
+                    setResult(RESULT_OK);
+                    finish();
+                }
+
             }
         });
 

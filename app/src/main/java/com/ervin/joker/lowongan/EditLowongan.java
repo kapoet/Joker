@@ -1,6 +1,7 @@
 package com.ervin.joker.lowongan;
 
 import android.app.DatePickerDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -9,8 +10,11 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.Toast;
 
+import com.ervin.joker.MainActivityPersonalia;
 import com.ervin.joker.R;
+import com.ervin.joker.pengguna.EditProfilePersonalia;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
@@ -43,6 +47,7 @@ public class EditLowongan extends AppCompatActivity {
         etDeskripsi = (EditText) findViewById(R.id.et_edit_lowongan_deskripsi);
         etPosisiLowong = (EditText) findViewById(R.id.et_edit_lowongan_posisi_lowong);
         etTanggal = (EditText) findViewById(R.id.et_edit_lowongan_date_picker);
+        etTanggal.setKeyListener(null);
         etPosisiLowong.setText(getIntent().getStringExtra("posisi_lowong"));
         etTanggal.setText(getIntent().getStringExtra("batas_kiriman"));
         etDeskripsi.setText(getIntent().getStringExtra("deskripsi_lowongan"));
@@ -90,9 +95,17 @@ public class EditLowongan extends AppCompatActivity {
                 Log.d("hahah", "Value is: " + timeInMillis);
                 String deskripsi = etDeskripsi.getText().toString();
                 String posisi = etPosisiLowong.getText().toString();
-                FirebaseUser user = mAuth.getCurrentUser();
-                LowonganPekerjaan lowongan = new LowonganPekerjaan(posisi,user.getUid(),deskripsi,timeInMillis,timeMilisSekarang);
-                myRef.child("Lowongan_pekerjaan").child(lowongan_ID).setValue(lowongan);
+                if(tanggal.isEmpty()||deskripsi.isEmpty()||posisi.isEmpty()){
+                    Toast.makeText(EditLowongan.this, "Pastikan semua field telah terisi",
+                            Toast.LENGTH_SHORT).show();
+                } else {
+                    FirebaseUser user = mAuth.getCurrentUser();
+                    LowonganPekerjaan lowongan = new LowonganPekerjaan(posisi,user.getUid(),deskripsi,timeInMillis,timeMilisSekarang);
+                    myRef.child("Lowongan_pekerjaan").child(lowongan_ID).setValue(lowongan);
+                    Intent intent = new Intent(EditLowongan.this,MainActivityPersonalia.class);
+                    startActivity(intent);
+                }
+
             }
         });
     }

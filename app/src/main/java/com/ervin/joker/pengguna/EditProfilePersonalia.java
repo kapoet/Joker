@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -30,14 +31,15 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.nguyenhoanglam.imagepicker.activity.ImagePicker;
+import com.nguyenhoanglam.imagepicker.activity.ImagePickerActivity;
+import com.nguyenhoanglam.imagepicker.model.Image;
 
 import java.io.File;
 import java.util.ArrayList;
 
 import de.hdodenhof.circleimageview.CircleImageView;
-import in.myinnos.awesomeimagepicker.activities.AlbumSelectActivity;
-import in.myinnos.awesomeimagepicker.helpers.ConstantsCustomGallery;
-import in.myinnos.awesomeimagepicker.models.Image;
+
 
 /**
  * Created by ervin on 6/8/2017.
@@ -55,7 +57,7 @@ public class EditProfilePersonalia extends AppCompatActivity {
     ProgressDialog progressDialog;
     private StorageReference mStorageRef;
     DatabaseReference myRef;
-    private static final int PICK_IMAGE = ConstantsCustomGallery.REQUEST_CODE;
+    private static final int PICK_IMAGE = 8;
     private static final int GET_DATA = 7;
     private FirebaseAuth.AuthStateListener mAuthListener;
     String jenis_pengguna = "Personalia";
@@ -72,6 +74,7 @@ public class EditProfilePersonalia extends AppCompatActivity {
         btnRegister = (Button) findViewById(R.id.btn_edit_profile_personaloa);
         ivGambarProfile = (CircleImageView) findViewById(R.id.iv_edit_profile_photo);
         ivUploadVideo = (ImageView) findViewById(R.id.iv_edit_profile_upload_video);
+        edtVideo.setKeyListener(null);
         progressDialog = new ProgressDialog(EditProfilePersonalia.this);
         mAuth = FirebaseAuth.getInstance();
         FirebaseDatabase database = FirebaseDatabase.getInstance();
@@ -125,49 +128,57 @@ public class EditProfilePersonalia extends AppCompatActivity {
                             Toast.LENGTH_SHORT).show();
                     progressDialog.dismiss();
                 }else {
-                    user.updateEmail(email)
-                            .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                @Override
-                                public void onComplete(@NonNull Task<Void> task) {
-                                    if (task.isSuccessful()) {
-                                        Log.d(TAG, "User email address updated.");
+                    if(isValidEmail(email)&&password.length()>7){
+                        user.updateEmail(email)
+                                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        if (task.isSuccessful()) {
+                                            Log.d(TAG, "User email address updated.");
+                                        }
                                     }
-                                }
-                            });
-                    user.updatePassword(password)
-                            .addOnCompleteListener(new OnCompleteListener<Void>() {
-                                @Override
-                                public void onComplete(@NonNull Task<Void> task) {
-                                    if (task.isSuccessful()) {
-                                        Log.d(TAG, "User password updated.");
+                                });
+                        user.updatePassword(password)
+                                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Void> task) {
+                                        if (task.isSuccessful()) {
+                                            Log.d(TAG, "User password updated.");
+                                        }
                                     }
-                                }
-                            });
-                    StorageReference riversRef = mStorageRef.child("images/" + user.getUid() + "/" + "phto_profile.jpg");
-                    riversRef.putFile(rawPathImage)
-                            .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                                @Override
-                                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                    // Get a URL to the uploaded content
-                                    @SuppressWarnings("VisibleForTests")
-                                    Uri downloadUrl = taskSnapshot.getDownloadUrl();
-                                    linkPhoto = String.valueOf(downloadUrl);
-                                    User pelamar = new User(nama, linkPhoto, jenis_pengguna, deskripsi, video);
-                                    myRef.child("User").child(user.getUid()).setValue(pelamar);
+                                });
+                        StorageReference riversRef = mStorageRef.child("images/" + user.getUid() + "/" + "phto_profile.jpg");
+                        riversRef.putFile(rawPathImage)
+                                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                    @Override
+                                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                        // Get a URL to the uploaded content
+                                        @SuppressWarnings("VisibleForTests")
+                                        Uri downloadUrl = taskSnapshot.getDownloadUrl();
+                                        linkPhoto = String.valueOf(downloadUrl);
+                                        User pelamar = new User(nama, linkPhoto, jenis_pengguna, deskripsi, video);
+                                        myRef.child("User").child(user.getUid()).setValue(pelamar);
 
-                                }
-                            })
-                            .addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception exception) {
+                                    }
+                                })
+                                .addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception exception) {
 
-                                    // Handle unsuccessful uploads
-                                    // ...
-                                }
-                            });
-                    progressDialog.dismiss();
-                    Intent intent = new Intent(EditProfilePersonalia.this,MainActivityPersonalia.class);
-                    startActivity(intent);
+                                        // Handle unsuccessful uploads
+                                        // ...
+                                    }
+                                });
+                        progressDialog.dismiss();
+                        Intent intent = new Intent(EditProfilePersonalia.this,MainActivityPersonalia.class);
+                        startActivity(intent);
+                        finish();
+                    } else {
+                        progressDialog.dismiss();
+                        Toast.makeText(EditProfilePersonalia.this, "Pastikan email dan password anda benar",
+                                Toast.LENGTH_SHORT).show();
+                    }
+
                 }
             }
         });
@@ -175,9 +186,12 @@ public class EditProfilePersonalia extends AppCompatActivity {
         ivGambarProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(EditProfilePersonalia.this, AlbumSelectActivity.class);
-                intent.putExtra(ConstantsCustomGallery.INTENT_EXTRA_LIMIT, 1); // set limit for image selection
-                startActivityForResult(intent, ConstantsCustomGallery.REQUEST_CODE);
+                ImagePicker.create(EditProfilePersonalia.this)
+                        .folderMode(false) // folder mode (false by default)
+                        .single() // single mode
+                        .limit(1) // max images can be selected (999 by default)
+                        .showCamera(true) // show camera or not (true by default)
+                        .start(PICK_IMAGE);
             }
         });
 
@@ -195,18 +209,11 @@ public class EditProfilePersonalia extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode){
             case PICK_IMAGE:
-                if(resultCode == RESULT_OK && data != null){
-                    ArrayList<Image> images = data.getParcelableArrayListExtra(ConstantsCustomGallery.INTENT_EXTRA_IMAGES);
-
-                    for (int i = 0; i < images.size(); i++) {
-                        Uri uri = Uri.fromFile(new File(images.get(i).path));
-                        // start play with image uri
-                        rawPathImage= uri;
-                    }
-                    // pathImage = rawPathImage.replaceAll("file://","");// untuk menghilangkan "file//" pada path gambar
-                    Glide.with(EditProfilePersonalia.this).load(rawPathImage).dontAnimate().into(ivGambarProfile);
-                    gambar = true;
-                }
+            ArrayList<Image> images = data.getParcelableArrayListExtra(ImagePickerActivity.INTENT_EXTRA_SELECTED_IMAGES);
+            Uri uri = Uri.fromFile(new File(images.get(0).getPath()));
+            rawPathImage= uri;
+            Glide.with(EditProfilePersonalia.this).load(rawPathImage).dontAnimate().into(ivGambarProfile);
+            gambar=true;
                 break;
             case GET_DATA:
                 if(resultCode == RESULT_OK && data != null){
@@ -216,5 +223,13 @@ public class EditProfilePersonalia extends AppCompatActivity {
                 }
         }
 
+    }
+
+    public final static boolean isValidEmail(CharSequence target) {
+        if (TextUtils.isEmpty(target)) {
+            return false;
+        } else {
+            return android.util.Patterns.EMAIL_ADDRESS.matcher(target).matches();
+        }
     }
 }

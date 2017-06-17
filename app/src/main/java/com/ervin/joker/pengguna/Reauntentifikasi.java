@@ -41,34 +41,42 @@ public class Reauntentifikasi extends AppCompatActivity {
                 progressDialog.setMessage("Loading ...");
                 progressDialog.show();
                 FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                String mail = email.getText().toString();
+                String pass = password.getText().toString();
+                if(!mail.isEmpty()&&!pass.isEmpty()){
+                    AuthCredential credential = EmailAuthProvider
+                            .getCredential(email.getText().toString(), password.getText().toString());
+                    user.reauthenticate(credential)
+                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    if (task.isSuccessful()) {
+                                        progressDialog.dismiss();
+                                        String jenis = getIntent().getStringExtra("jenis");
+                                        if (jenis.equals("Pelamar_pekerjaan")) {
+                                            Intent intent = new Intent(Reauntentifikasi.this, EditProfilePelamar.class);
+                                            startActivity(intent);
+                                            finish();
+                                        } else {
+                                            Intent intent = new Intent(Reauntentifikasi.this, EditProfilePersonalia.class);
+                                            startActivity(intent);
+                                            finish();
+                                        }
 
-                AuthCredential credential = EmailAuthProvider
-                        .getCredential(email.getText().toString(), password.getText().toString());
-
-                user.reauthenticate(credential)
-                        .addOnCompleteListener(new OnCompleteListener<Void>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Void> task) {
-                                if (task.isSuccessful()) {
-                                    progressDialog.dismiss();
-                                    String jenis = getIntent().getStringExtra("jenis");
-                                    if (jenis.equals("Pelamar_pekerjaan")) {
-                                        Intent intent = new Intent(Reauntentifikasi.this, EditProfilePelamar.class);
-                                        startActivity(intent);
-                                        finish();
                                     } else {
-                                        Intent intent = new Intent(Reauntentifikasi.this, EditProfilePersonalia.class);
-                                        startActivity(intent);
-                                        finish();
+                                        progressDialog.dismiss();
+                                        Toast.makeText(Reauntentifikasi.this,"Email/Sandi yang dimasukkan salah", Toast.LENGTH_SHORT).show();
                                     }
-
-                                } else {
-                                    progressDialog.dismiss();
-                                    Toast.makeText(Reauntentifikasi.this,"Email/Sandi yang dimasukkan salah", Toast.LENGTH_SHORT).show();
                                 }
-                            }
 
-                        });
+                            });
+                } else {
+                    progressDialog.dismiss();
+                    Toast.makeText(Reauntentifikasi.this,"Silahkan isikan email/sandi anda", Toast.LENGTH_SHORT).show();
+                }
+
+
+
             }
         });
 

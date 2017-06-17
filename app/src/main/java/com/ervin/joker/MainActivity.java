@@ -148,6 +148,9 @@ public class MainActivity extends AppCompatActivity
             Intent intent = new Intent(this, SignIn.class);
             startActivity(intent);
             finish();
+        } else if (id ==R.id.bekas){
+            FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+            ft.replace(R.id.content_frame, new BerkasLamaranSaya()).commit();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

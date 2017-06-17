@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#faf5f7"
+    android:background="#f7d7e4"
     android:orientation="vertical">
 
 
@@ -108,7 +108,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:background="#995381c1"
-                    android:hint="Password"
+                    android:hint="Sandi minimal 8 karakter"
                     android:inputType="textPassword"
                     android:padding="16dp"
                     android:singleLine="true"
@@ -218,7 +218,7 @@
                     android:layout_weight="1"
                     android:background="#995381c1"
                     android:ems="10"
-                    android:hint="Video ID"
+                    android:hint="Video tentang perusahaan"
                     android:inputType="none"
                     android:padding="16dp"
                     android:textColor="@color/common_google_signin_btn_text_dark_focused"
