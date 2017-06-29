@@ -51,7 +51,7 @@ public class LowonganPekerjaanPelamar extends Fragment {
     Button coba;
     boolean pertama = true;
     int batas = 2;
-
+    int l = 0;
     TextView a;
     @Nullable
     @Override
@@ -338,8 +338,17 @@ public class LowonganPekerjaanPelamar extends Fragment {
                         super.onDataChanged();
                         a.setVisibility(getItemCount() == 0 ? View.VISIBLE : View.GONE);
                     }
-                };mFirebaseAdapter.notifyDataSetChanged();
+                };
+                mFirebaseAdapter.getItemCount();
+                int a = mFirebaseAdapter.getItemCount()-(batas);
+
+                mFirebaseAdapter.notifyDataSetChanged();
                 rv.setAdapter(mFirebaseAdapter);
+
+
+                Log.d(TAG, "tanggal hari ini: " + l);
+//                rv.getLayoutManager().scrollToPosition(6);
+
 
             }
 

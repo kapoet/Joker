@@ -1,7 +1,9 @@
 package com.ervin.joker.lowongan;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -17,12 +19,20 @@ import com.google.android.youtube.player.YouTubeInitializationResult;
 import com.google.android.youtube.player.YouTubePlayer;
 import com.google.android.youtube.player.YouTubePlayer.Provider;
 import com.google.android.youtube.player.YouTubePlayerFragment;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class DetailLowongan extends AppCompatActivity implements YouTubePlayer.OnInitializedListener {
 
     private static final int RECOVERY_REQUEST = 1;
     private static final int KIRIM_LAMARAN = 12;
     private YouTubePlayerFragment youTubeView;
+    private FirebaseAuth mAuth;
     TextView tv_posisi_lowongan, tv_nama_perusahaan, tv_tanggal_terbit, tv_batas_pengiriman, tv_tentang_perusahaan
             ,tv_deskripsi,tv_deskripsi_pekerjaan;
     Button btn_kirim_lamaran,btn_lihat_berkas, btnFavorit;
@@ -35,6 +45,8 @@ public class DetailLowongan extends AppCompatActivity implements YouTubePlayer.O
             link_video ="link_video",
             id_lowongan ="lowongan_id" ;
     String video;
+    String lwonganID;
+    boolean sudah = false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,6 +80,7 @@ public class DetailLowongan extends AppCompatActivity implements YouTubePlayer.O
         tv_deskripsi.setText(getIntent().getStringExtra(tentang_perusahaan));
         tv_deskripsi_pekerjaan.setText(getIntent().getStringExtra(deskripsi_lowongan));
         final String lowongan_ID = getIntent().getStringExtra(id_lowongan);
+        lwonganID=lowongan_ID;
         Log.d("ini adalah", "hasilnya" + lowongan_ID);
         if(jenis_pengguna=="Personalia"){
             btn_lihat_berkas.setVisibility(View.VISIBLE);
@@ -75,9 +88,34 @@ public class DetailLowongan extends AppCompatActivity implements YouTubePlayer.O
         btn_kirim_lamaran.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(DetailLowongan.this, KirimLamaran.class);
-                intent.putExtra(id_lowongan,lowongan_ID);
-                startActivityForResult(intent,KIRIM_LAMARAN);
+                FirebaseDatabase database = FirebaseDatabase.getInstance();
+                DatabaseReference myRef = database.getReference();
+                mAuth = FirebaseAuth.getInstance();
+                final FirebaseUser user = mAuth.getCurrentUser();
+                Log.d("afafaf", "tanggal hari ini: " + lowongan_ID+"_"+user.getUid());
+                myRef.child("berkas").addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        // This method is called once with the initial value and again
+                        // whenever data at this location is updated.
+                        if (dataSnapshot.hasChild(lowongan_ID + "_" + user.getUid())) {
+                            sudah=true;
+                            AlertDialog diaBox = AskOption();
+                            diaBox.show();
+                        } else {
+                            Intent intent = new Intent(DetailLowongan.this, KirimLamaran.class);
+                            intent.putExtra(id_lowongan,lowongan_ID);
+                            startActivityForResult(intent,KIRIM_LAMARAN);
+                        }
+                    }
+
+
+                    @Override
+                    public void onCancelled(DatabaseError error) {
+                        // Failed to read value
+                    }
+                });
+
             }
         });
         btn_lihat_berkas.setOnClickListener(new View.OnClickListener() {
@@ -136,5 +174,38 @@ public class DetailLowongan extends AppCompatActivity implements YouTubePlayer.O
 
     protected Provider getYouTubePlayerProvider() {
         return youTubeView;
+    }
+
+    private AlertDialog AskOption()
+    {
+        AlertDialog myQuittingDialogBox =new AlertDialog.Builder(DetailLowongan.this)
+                //set message, title, and icon
+                .setTitle("Beras sudah terkirim")
+                .setMessage("Apakah anda ingin mengirim lowongan lagi?")
+                //.setIcon(R.drawable.delete)
+
+                .setPositiveButton("Ya", new DialogInterface.OnClickListener() {
+
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        Intent intent = new Intent(DetailLowongan.this, KirimLamaran.class);
+                        intent.putExtra(id_lowongan,lwonganID);
+                        startActivityForResult(intent,KIRIM_LAMARAN);
+                        dialog.dismiss();
+                    }
+
+                })
+
+
+
+                .setNegativeButton("Tidak", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+
+                        dialog.dismiss();
+
+                    }
+                })
+                .create();
+        return myQuittingDialogBox;
+
     }
 }

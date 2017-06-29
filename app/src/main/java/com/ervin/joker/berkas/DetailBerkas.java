@@ -96,10 +96,11 @@ public class DetailBerkas extends AppCompatActivity implements YouTubePlayer.OnI
 
                     Dokumen pelamar = childSnapshot.getValue(Dokumen.class);
                     String nama_file = pelamar.getNama_dokumen();
-                    Log.d("aaa", "Value nama file: " + nama_file);
+                    Log.d("aaa", "Value nama file: " + dataSnapshot.getChildren());
                     name = nama_file;
 
                 }
+
             }
 
             @Override

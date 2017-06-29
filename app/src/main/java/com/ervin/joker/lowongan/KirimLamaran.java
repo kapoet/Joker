@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -30,7 +31,7 @@ public class KirimLamaran extends AppCompatActivity {
     private static final String TAG = "KirimLamaran";
     Button btnKirim;
     EditText etVideo, etDokumen;
-    ImageView ivVideo,ivDokumen;
+    ImageButton ivVideo,ivDokumen;
     String filePath;
     private static final int GET_VIDEO = 7;
     private static final int GET_DOKUMEN = 8;
@@ -47,8 +48,8 @@ public class KirimLamaran extends AppCompatActivity {
         etDokumen = (EditText) findViewById(R.id.et_kirim_berkas_lamaran_dokumen);
         etVideo = (EditText) findViewById(R.id.et_kirim_berkas_lamaran_video);
         btnKirim = (Button) findViewById(R.id.btn_kirim_berkas_kirim);
-        ivDokumen = (ImageView) findViewById(R.id.iv_kirim_berkas_lamaran_dokumen);
-        ivVideo = (ImageView) findViewById(R.id.iv_kirim_berkas_lamaran_video);
+        ivDokumen = (ImageButton) findViewById(R.id.iv_kirim_berkas_lamaran_dokumen);
+        ivVideo = (ImageButton) findViewById(R.id.iv_kirim_berkas_lamaran_video);
         mAuth = FirebaseAuth.getInstance();
         mStorageRef = FirebaseStorage.getInstance().getReference();
         etDokumen.setKeyListener(null);
@@ -70,11 +71,6 @@ public class KirimLamaran extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intetn = new Intent(KirimLamaran.this, UnggahDokumen.class);
                 startActivityForResult(intetn, GET_DOKUMEN);
-//                new MaterialFilePicker()
-//                        .withActivity(KirimLamaran.this)
-//                        .withRequestCode(GET_DOKUMEN)
-//                        .start();
-//                Intent intent = ne
             }
         });
 

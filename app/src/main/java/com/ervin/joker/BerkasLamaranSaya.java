@@ -78,7 +78,7 @@ public class BerkasLamaranSaya extends Fragment {
         mFirebaseAdapter = new FirebaseRecyclerAdapter<BerkasLamaran, LowonganPekerjaanAdapter>(BerkasLamaran.class, R.layout.layout_item_pekerjaan, LowonganPekerjaanAdapter.class,myRef.orderByChild("id_pelamar").equalTo(user.getUid())) {
             @Override
             protected void populateViewHolder(final LowonganPekerjaanAdapter viewHolder, final BerkasLamaran model, final int position) {
-                String lowonganID = model.getLowongan_id();
+                final String lowonganID = model.getLowongan_id();
                 String expired = model.getLink_dokumen();
                 Calendar date = Calendar.getInstance();
                 long millisecondsDate = date.getTimeInMillis();
@@ -195,7 +195,8 @@ public class BerkasLamaranSaya extends Fragment {
                                 intent.putExtra("nama_perusahaan",getNama);
                                 intent.putExtra("gambar_perusahaan",getGambar);
                                 intent.putExtra("link_video",link_video);
-                                intent.putExtra("lowongan_id",abu);
+                                intent.putExtra("lowongan_id",lowonganID);
+
                                 intent.putExtra("jenis_pengguna", jenis_pengguna);
                                 startActivity(intent);
                             }
